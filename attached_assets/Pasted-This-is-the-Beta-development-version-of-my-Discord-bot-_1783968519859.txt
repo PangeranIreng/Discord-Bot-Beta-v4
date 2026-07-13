@@ -1,0 +1,179 @@
+This is the Beta development version of my Discord bot.
+
+IMPORTANT:
+Do NOT modify any existing systems except the BoomBox Logs.
+Do NOT change:
+- BoomBox conversion logic
+- YouTube downloader
+- Anti-bot fixes
+- Premium system
+- Daily limit
+- Database
+- Commands
+- Roles
+- Permissions
+- Monitoring
+- Upload process
+- Auto role
+- Economy
+- Any other features
+
+Only redesign and improve the BoomBox Logs system.
+
+========================================
+BOOMBOX LOGS REDESIGN
+========================================
+
+The requester should still receive their generated BoomBox URL exactly as before.
+
+The BoomBox Logs channel is only used as an archive/history of generated BoomBox URLs.
+
+========================================
+1. REMOVE USER INFORMATION
+========================================
+
+Completely remove:
+
+- Username
+- Mention
+- User ID
+- Avatar
+- Nickname
+- Any information showing who requested the BoomBox
+
+Only log the BoomBox result.
+
+========================================
+2. CLEAN EMBED DESIGN
+========================================
+
+Use ONE clean Discord Embed.
+
+Color:
+#3BA4FF
+
+Title:
+🎵 BoomBox Logs
+
+Description format:
+
+━━━━━━━━━━━━━━━━━━
+
+🎵 <YouTube Video Title>
+
+🌍 Source : YouTube
+
+⏱ Duration : <Video Duration>
+
+🔗 BoomBox URL
+<Generated MP3 URL>
+
+🕒 <Relative Discord Timestamp>
+
+━━━━━━━━━━━━━━━━━━
+
+Repeat this layout for every generated BoomBox.
+
+Footer:
+
+Pangeran Assistant AI • BoomBox Logs
+
+Use Embed Timestamp.
+
+========================================
+3. COMPACT LAYOUT
+========================================
+
+Reduce unnecessary spacing.
+
+Everything should look clean and easy to read.
+
+Do NOT add decorative emojis everywhere.
+
+Only use:
+
+🎵
+🌍
+⏱
+🔗
+🕒
+
+========================================
+4. SMART LOG MESSAGE
+========================================
+
+DO NOT send a new log message every time.
+
+Instead:
+
+Save the latest BoomBox log message ID.
+
+Whenever a new BoomBox is generated:
+
+- Edit that same embed.
+- Insert the newest BoomBox entry at the TOP.
+- Keep previous entries below it.
+
+Newest first.
+
+========================================
+5. DISCORD LIMIT HANDLING
+========================================
+
+If the current embed/message is close to Discord's maximum size:
+
+Automatically:
+
+- Create ONE new BoomBox Log embed.
+- Save its Message ID.
+- Continue editing ONLY the newest embed.
+
+Never spam the log channel.
+
+Only create another log message when absolutely necessary because of Discord limits.
+
+========================================
+6. KEEP HISTORY
+========================================
+
+The log channel should become a readable history.
+
+Example:
+
+Newest BoomBox
+
+Older BoomBox
+
+Older BoomBox
+
+Older BoomBox
+
+Always sorted from newest to oldest.
+
+========================================
+7. DO NOT CHANGE ANYTHING ELSE
+========================================
+
+Do not modify any existing features.
+
+Do not change BoomBox generation.
+
+Do not change YouTube downloading.
+
+Do not change fallback clients.
+
+Do not change premium.
+
+Do not change limits.
+
+Do not change commands.
+
+Do not change the database.
+
+Do not change permissions.
+
+Do not change monitoring.
+
+Do not change uploads.
+
+Only improve the BoomBox Logs system and its visual appearance.

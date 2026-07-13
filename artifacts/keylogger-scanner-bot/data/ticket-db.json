@@ -1,0 +1,23 @@
+{
+  "config": {
+    "panelChannelId": "1462696203694379100",
+    "panelMessageId": "1526320879917858888",
+    "logsChannelId": "1524811019514286263",
+    "dashboardMessageId": "1526320881339469939",
+    "mentionRoleId": "1462696203241132118"
+  },
+  "counter": 1,
+  "tickets": [
+    {
+      "number": 1,
+      "threadId": "1526321302858895420",
+      "userId": "1462685321262272664",
+      "handlerId": "1462685321262272664",
+      "status": "closed",
+      "createdAt": "2026-07-13T20:15:57.226Z",
+      "closedAt": "2026-07-13T20:16:26.005Z",
+      "durationMs": 28779,
+      "firstReplySent": false
+    }
+  ]
+}

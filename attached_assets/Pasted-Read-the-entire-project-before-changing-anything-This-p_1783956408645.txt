@@ -1,0 +1,241 @@
+Read the entire project before changing anything.
+
+This project was imported from ZIP.
+
+IMPORTANT:
+Do NOT rewrite the project.
+Do NOT replace features.
+Do NOT simplify the architecture.
+Do NOT create a new bot.
+Do NOT remove any commands.
+Keep all existing features exactly as they are.
+
+Your task is to perform a COMPLETE CODE AUDIT first, then fix only the real bugs.
+
+==================================================
+PHASE 1 - FULL AUDIT
+==================================================
+
+Analyze the entire project.
+
+Check every folder.
+
+Check every import.
+
+Check every event.
+
+Check every startup sequence.
+
+Check every command.
+
+Check every scheduler.
+
+Check every queue.
+
+Check every collector.
+
+Check every listener.
+
+Check every async flow.
+
+Check every retry.
+
+Check every callback.
+
+Check every module initialization.
+
+Check every duplicate event registration.
+
+Check every circular import.
+
+Check every message processing flow.
+
+Check every interaction flow.
+
+Check every BoomBox flow.
+
+Check every Keylogger Scanner flow.
+
+Find ALL bugs before modifying anything.
+
+==================================================
+PHASE 2 - FIX
+==================================================
+
+Fix every real bug found.
+
+Especially:
+
+- Duplicate replies
+- Duplicate BoomBox processing
+- Duplicate Keylogger scans
+- Duplicate embeds
+- Duplicate logs
+- Duplicate slash responses
+- Unknown Interaction
+- Interaction already acknowledged
+- Memory leaks
+- Event leaks
+- Queue duplication
+- Scheduler duplication
+- Collector duplication
+
+Make sure:
+
+1 Discord message = exactly 1 execution.
+
+==================================================
+EVENT RULES
+==================================================
+
+There must be exactly ONE:
+
+client.login()
+
+new Client()
+
+messageCreate listener
+
+interactionCreate listener
+
+ready listener
+
+No duplicate initialization.
+
+No duplicate imports.
+
+No duplicate handlers.
+
+No duplicate queues.
+
+No duplicate schedulers.
+
+==================================================
+MESSAGE FLOW
+==================================================
+
+Correct processing order:
+
+Ignore bot
+
+↓
+
+Ignore unsupported channels
+
+↓
+
+Global duplicate protection
+
+↓
+
+Prefix commands
+
+↓
+
+BoomBox
+
+↓
+
+Scanner
+
+↓
+
+Other handlers
+
+Duplicate protection MUST happen BEFORE every feature.
+
+There must be only ONE duplicate protection in the project.
+
+Remove every old duplicate workaround.
+
+==================================================
+BOOMBOX
+==================================================
+
+Keep all BoomBox features.
+
+Keep yt-dlp.
+
+Keep fallback.
+
+Keep Premium.
+
+Keep limits.
+
+Keep logs.
+
+Keep hosting.
+
+Keep database.
+
+Keep UI.
+
+Do NOT remove anything.
+
+Only make sure one link is processed once.
+
+==================================================
+KEYLOGGER
+==================================================
+
+Keep every detection feature.
+
+Keep heuristics.
+
+Keep AST.
+
+Keep ZIP extraction.
+
+Keep Lua analysis.
+
+Keep UI.
+
+Keep embeds.
+
+Keep logs.
+
+One uploaded file = exactly one scan.
+
+==================================================
+COMMANDS
+==================================================
+
+Every command executes exactly once.
+
+No duplicate replies.
+
+No duplicate embeds.
+
+==================================================
+TESTING
+==================================================
+
+Automatically test:
+
+!hesu
+
+one Lua file
+
+one BoomBox link
+
+one slash command
+
+Verify every action runs exactly once.
+
+==================================================
+REPORT
+==================================================
+
+After all fixes:
+
+List every bug found.
+
+List every file modified.
+
+Explain why each bug happened.
+
+Explain why the fix works.
+
+Do NOT finish until every duplicate execution bug has been eliminated.
+
+The project must remain fully compatible with all existing features.

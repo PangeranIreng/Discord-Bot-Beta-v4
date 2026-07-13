@@ -1,0 +1,328 @@
+# Tambahkan Sistem Bug Report & Feature Request (Tanpa Mengubah Fitur Lama)
+
+JANGAN menghapus, mengubah, atau merusak fitur yang sudah ada. Semua fitur Boombox, Open Ticket, Premium, Role Panel, Scanner, AI, Admin Panel, Database, dan Command lain WAJIB tetap berjalan seperti sebelumnya.
+
+Tambahkan sistem baru bernama "Bug Report & Feature Request" dengan UI modern dan konsisten dengan tampilan Ticket System.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SLASH COMMAND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Buat Slash Command:
+
+/cbug
+
+Hanya Owner yang dapat menggunakan command ini.
+
+Parameter:
+
+• panel_channel (Channel)
+→ Channel tempat Panel Bug & Feature dikirim.
+
+• logs_channel (Channel)
+→ Channel tempat semua laporan Bug & Feature masuk.
+
+• developer_role (Role)
+→ Role yang otomatis di-mention ketika ada laporan baru.
+
+Saat command dijalankan:
+
+- Simpan seluruh konfigurasi ke database.
+- Jika panel sudah pernah dibuat, edit panel lama (jangan spam panel baru).
+- Simpan Message ID panel agar tetap aktif setelah bot restart.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PANEL BUG & FEATURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Bot mengirim panel seperti berikut:
+
+╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+
+          🐞 Bug & Feature
+
+Menemukan Bug?
+Punya ide Feature baru?
+
+Laporkan agar Bot menjadi
+lebih baik dan stabil.
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+
+Button:
+
+🐞 Report Bug
+💡 Request Feature
+
+Gunakan Discord Button Discord.js v14.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REPORT BUG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat user menekan tombol:
+
+🐞 Report Bug
+
+Bot membuka Modal.
+
+Field 1
+
+Judul Bug
+
+Jenis:
+Short Text
+
+Required:
+Ya
+
+Max:
+100 karakter
+
+Placeholder:
+
+Contoh:
+Bot Boombox Error
+
+━━━━━━━━━━━━━━━━
+
+Field 2
+
+Keterangan
+
+Jenis:
+Paragraph
+
+Required:
+Ya
+
+Max:
+1000 karakter
+
+Placeholder:
+
+Jelaskan Bug yang ditemukan...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REQUEST FEATURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat user menekan tombol:
+
+💡 Request Feature
+
+Bot membuka Modal.
+
+Field 1
+
+Judul Feature
+
+Jenis:
+Short Text
+
+Required:
+Ya
+
+Max:
+100 karakter
+
+Placeholder:
+
+Contoh:
+Tambah Spotify
+
+━━━━━━━━━━━━━━━━
+
+Field 2
+
+Keterangan
+
+Jenis:
+Paragraph
+
+Required:
+Ya
+
+Max:
+1000 karakter
+
+Placeholder:
+
+Jelaskan Feature yang diinginkan...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SETELAH USER MENEKAN KIRIM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN kirim pesan ke channel publik.
+
+Bot hanya mengirim EPHEMERAL MESSAGE kepada user.
+
+Jika Report Bug:
+
+━━━━━━━━━━━━━━━━
+
+✅ Terima Kasih!
+
+Laporan Bug berhasil dikirim.
+
+Developer akan segera meninjau
+laporan yang Anda kirim.
+
+Mohon maaf atas ketidaknyamanan
+yang terjadi.
+
+Terima kasih telah membantu
+meningkatkan kualitas Bot.
+
+[ Dismiss ]
+
+━━━━━━━━━━━━━━━━
+
+Jika Request Feature:
+
+━━━━━━━━━━━━━━━━
+
+💡 Terima Kasih!
+
+Request Feature berhasil dikirim.
+
+Developer akan mempertimbangkan
+Feature yang Anda usulkan.
+
+Terima kasih atas masukan Anda.
+
+[ Dismiss ]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOGS BUG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat ada Bug baru:
+
+Bot otomatis mengirim ke Channel Logs.
+
+Sebelum Embed:
+
+Mention otomatis:
+
+@Developer
+
+(role yang dipilih saat menjalankan /cbug)
+
+Embed:
+
+━━━━━━━━━━━━━━━━━━
+
+🚨 ADA BUG NIH
+
+━━━━━━━━━━━━━━━━━━
+
+🐞 Judul
+(Berisi Judul yang ditulis User)
+
+📝 Keterangan
+(Berisi Keterangan User)
+
+👤 Pelapor
+(User yang mengirim)
+
+🕒 Waktu
+(Tanggal & Jam)
+
+━━━━━━━━━━━━━━━━━━
+
+Gunakan warna merah.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LOGS FEATURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat ada Feature baru:
+
+Bot otomatis mengirim ke Channel Logs.
+
+Sebelum Embed:
+
+Mention otomatis:
+
+@Developer
+
+Embed:
+
+━━━━━━━━━━━━━━━━━━
+
+💡 REQUEST FEATURE
+
+━━━━━━━━━━━━━━━━━━
+
+✨ Judul
+(Berisi Judul User)
+
+📝 Keterangan
+(Berisi Keterangan User)
+
+👤 Pengirim
+(User)
+
+🕒 Waktu
+(Tanggal & Jam)
+
+━━━━━━━━━━━━━━━━━━
+
+Gunakan warna biru.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DATABASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Simpan:
+
+• Panel Channel
+• Logs Channel
+• Developer Role
+• Message ID Panel
+
+Agar panel tetap aktif walaupun Bot restart.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PERMISSION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• Hanya Owner dapat menggunakan /cbug.
+
+• Semua Member dapat menekan tombol.
+
+• Hanya Developer Role yang otomatis di-mention.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YANG TIDAK BOLEH DILAKUKAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Jangan membuat Thread.
+
+❌ Jangan membuat Ticket.
+
+❌ Jangan membuat Channel baru.
+
+❌ Jangan membuat Claim Ticket.
+
+❌ Jangan membuat Close Ticket.
+
+❌ Jangan mengubah fitur Ticket yang sudah ada.
+
+❌ Jangan mengubah sistem Boombox.
+
+❌ Jangan mengubah sistem Premium.
+
+❌ Jangan mengubah Admin Panel.
+
+❌ Jangan menghapus database lama.
+
+❌ Jangan mengubah command yang sudah ada.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HASIL AKHIR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Buat sistem Bug Report & Feature Request yang ringan, modern, rapi, menggunakan Discord.js v14, konsisten dengan desain Ticket System, menyimpan konfigurasi ke database, tidak spam panel, tidak membuat thread, dan tidak mengubah fitur lain yang sudah ada.

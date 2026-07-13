@@ -1,0 +1,3 @@
+# secrets written by the setup page -- never commit
+.env
+.env.local

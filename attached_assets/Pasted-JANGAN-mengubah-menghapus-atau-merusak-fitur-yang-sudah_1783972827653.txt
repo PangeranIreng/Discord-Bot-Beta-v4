@@ -1,0 +1,282 @@
+JANGAN mengubah, menghapus, atau merusak fitur yang sudah ada. Pertahankan seluruh command, database, Boombox, AI, Admin Panel, Welcome, dan fitur lainnya. Hanya tambahkan sistem Ticket berikut.
+
+========================================
+🎫 OPEN TICKET SYSTEM (VERSI FINAL)
+========================================
+
+Buat sistem Ticket Discord modern menggunakan discord.js v14.
+
+━━━━━━━━━━━━━━━━━━━━━━
+1. Slash Command
+━━━━━━━━━━━━━━━━━━━━━━
+
+Buat command:
+
+/cticket
+
+Opsi:
+
+• panel_channel
+(Channel tempat panel Open Ticket dikirim.)
+
+• logs_channel
+(Channel Dashboard Ticket Logs.)
+
+• mention_role
+(Role yang akan di-mention saat Ticket baru dibuat.
+Contoh: @Owner @Developer.)
+
+Semua konfigurasi disimpan ke database agar tetap tersimpan setelah bot restart.
+
+━━━━━━━━━━━━━━━━━━━━━━
+2. Panel Open Ticket
+━━━━━━━━━━━━━━━━━━━━━━
+
+Bot mengirim panel berikut.
+
+╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+
+             🎫 Open Ticket
+
+Butuh bantuan?
+
+💢 Kesel kehabisan limit terus?
+🤖 Mau sewa Bot?
+🎤 Ready Jasa MC?
+
+Buka Ticket sesuai kebutuhan Anda.
+
+⚠️ Mohon gunakan Ticket dengan bijak.
+Dilarang membuat Ticket untuk bercanda,
+spam, atau tanpa tujuan yang jelas.
+Pelanggaran dapat dikenakan sanksi
+sesuai aturan yang berlaku.
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+
+Button:
+
+🎫 Open Ticket
+
+━━━━━━━━━━━━━━━━━━━━━━
+3. Saat User Klik Open Ticket
+━━━━━━━━━━━━━━━━━━━━━━
+
+Bot otomatis:
+
+• Membuat Private Thread di bawah Panel Ticket.
+
+Nama:
+
+Ticket #001
+Ticket #002
+dst.
+
+User otomatis langsung diarahkan / dibawa masuk ke Thread tersebut.
+
+Thread hanya dapat dilihat oleh:
+
+• User pembuat
+• Owner
+• Developer
+• Handler/Admin yang memiliki izin
+
+Member lain tidak dapat melihat Thread.
+
+━━━━━━━━━━━━━━━━━━━━━━
+4. Pesan Pertama
+━━━━━━━━━━━━━━━━━━━━━━
+
+Bot otomatis mengirim:
+
+╭━━━━━━━━━━━━━━━━━━━━╮
+
+        🎫 Ticket #001
+
+Selamat Datang.
+
+Silakan sampaikan kebutuhan
+atau keperluan Anda.
+
+━━━━━━━━━━━━━━━━━━━━
+
+Status
+🟡 Menunggu Handle...
+
+╰━━━━━━━━━━━━━━━━━━━━╯
+
+━━━━━━━━━━━━━━━━━━━━━━
+5. Pesan Pertama User
+━━━━━━━━━━━━━━━━━━━━━━
+
+Saat user pertama kali mengirim pesan.
+
+Bot hanya membalas SATU KALI.
+
+Terima kasih.
+
+Ticket Anda telah diterima.
+
+Silakan tunggu,
+Handler akan segera
+merespons Ticket Anda.
+
+Setelah itu bot tidak membalas lagi.
+
+Walaupun user mengirim banyak pesan.
+
+━━━━━━━━━━━━━━━━━━━━━━
+6. Claim Ticket
+━━━━━━━━━━━━━━━━━━━━━━
+
+Button Claim Ticket HANYA muncul untuk:
+
+• Owner
+• Developer
+• Handler
+
+User tidak dapat melihat button ini.
+
+Saat Claim ditekan.
+
+Bot mengubah status menjadi:
+
+🟢 Di Handle
+
+Lalu menampilkan:
+
+Handler:
+@NamaHandler
+
+Button berubah menjadi:
+
+🔒 Close Ticket
+
+━━━━━━━━━━━━━━━━━━━━━━
+7. Close Ticket
+━━━━━━━━━━━━━━━━━━━━━━
+
+Hanya Handler yang melakukan Claim atau Owner yang dapat menekan Close Ticket.
+
+Saat ditekan.
+
+Bot:
+
+• Lock Thread
+• Archive Thread
+• Mengubah status menjadi Closed
+
+━━━━━━━━━━━━━━━━━━━━━━
+8. Dashboard Ticket Logs
+━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN spam pesan log.
+
+Gunakan SATU Dashboard yang selalu di-edit.
+
+Contoh:
+
+╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+
+           📋 Ticket Logs
+
+📊 Total Ticket : xxx
+
+🟡 Menunggu : x
+🟢 Di Handle : x
+🔴 Closed : x
+
+📄 Halaman x / x
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+
+Daftar Ticket:
+
+#205 🟡 Menunggu
+👤 User
+
+━━━━━━━━━━━━
+
+#204 🟢 Di Handle
+👨‍💻 Handler
+
+━━━━━━━━━━━━
+
+#203 🔴 Closed
+👨‍💻 Handler
+
+dst.
+
+━━━━━━━━━━━━━━━━━━━━━━
+9. Dashboard Navigation
+━━━━━━━━━━━━━━━━━━━━━━
+
+Tambahkan Button:
+
+⏮️ First
+◀️ Prev
+🔄 Refresh
+▶️ Next
+⏭️ Last
+
+Tambahkan Dropdown:
+
+📄 Pilih Halaman
+
+Page 1
+Page 2
+Page 3
+dst.
+
+Tambahkan Filter Dropdown:
+
+📂 Semua Ticket
+
+• Semua Ticket
+• 🟡 Menunggu
+• 🟢 Di Handle
+• 🔴 Closed
+
+Dashboard harus otomatis ter-update ketika:
+
+• Ticket baru dibuat
+• Ticket di Claim
+• Ticket di Close
+
+Tanpa mengirim pesan baru.
+
+━━━━━━━━━━━━━━━━━━━━━━
+10. Database
+━━━━━━━━━━━━━━━━━━━━━━
+
+Simpan seluruh data ke database.
+
+Minimal:
+
+• Total Ticket
+• Nomor Ticket
+• Status
+• User
+• Handler
+• Thread ID
+• Created At
+• Closed At
+• Duration
+• Logs Message ID
+• Dashboard Message ID
+• Panel Channel
+• Logs Channel
+• Mention Role
+
+━━━━━━━━━━━━━━━━━━━━━━
+11. Syarat Penting
+━━━━━━━━━━━━━━━━━━━━━━
+
+• Jangan mengubah fitur lain.
+• Jangan menghapus command yang sudah ada.
+• Jangan mengubah tampilan Boombox.
+• Jangan mengubah AI.
+• Jangan mengubah Admin Panel.
+• Jangan mengubah sistem lain.
+
+Tambahkan sistem Ticket ini sebagai fitur baru yang terpisah dan pastikan seluruh command lama tetap berfungsi 100%.

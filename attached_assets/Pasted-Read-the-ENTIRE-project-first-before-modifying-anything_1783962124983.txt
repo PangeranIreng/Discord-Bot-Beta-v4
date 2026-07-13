@@ -1,0 +1,495 @@
+Read the ENTIRE project first before modifying anything.
+
+DO NOT rewrite the project.
+DO NOT remove existing features.
+DO NOT change existing commands except where requested below.
+Keep the current coding style.
+Only add and improve the requested features.
+
+====================================================
+ACCESS CONTROL (VERY IMPORTANT)
+====================================================
+
+ALL admin commands below MUST NOT rely only on Discord permissions.
+
+The bot must validate BOTH:
+
+OWNER USER IDS
+
+1524067494313328690
+1516474566044680414
+
+These two IDs always have access.
+
+OR
+
+Users that have one of these roles:
+
+Owner Role
+1462696203241132118
+
+Developer Role
+1462696203241132117
+
+Meaning:
+
+Access Granted IF
+
+User ID == Owner1
+OR
+User ID == Owner2
+OR
+Has Owner Role
+OR
+Has Developer Role
+
+Otherwise deny access.
+
+Reply:
+
+❌ Kamu tidak memiliki izin menggunakan command ini.
+
+This permission system must apply to:
+
+/addprem
+/removeprem
+/setlimit
+/resetlimit
+/cpanel
+/paneledit
+
+and every Premium/BoomBox administration command.
+
+====================================================
+PREMIUM ROLE
+====================================================
+
+Premium Role ID
+
+1462696202842931333
+
+Never hardcode another Premium role.
+
+====================================================
+LOG CHANNEL
+====================================================
+
+Premium Log Channel
+
+1524810277978247168
+
+Every action below sends NEW MESSAGE.
+
+NEVER EDIT OLD LOG MESSAGE.
+
+====================================================
+MONITORING CHANNEL
+====================================================
+
+Monitoring Channel
+
+1524810922009432144
+
+This channel contains ONLY ONE dashboard message.
+
+The bot edits this message automatically whenever data changes.
+
+====================================================
+PREMIUM SYSTEM
+====================================================
+
+Improve /addprem
+
+Syntax
+
+/addprem user duration
+
+Duration format
+
+1m
+10m
+
+1h
+12h
+
+1d
+7d
+30d
+90d
+
+If duration is ONLY NUMBER
+
+Example
+
+1
+5
+100
+
+Treat as
+
+Permanent
+
+NOT 1 day.
+
+====================================================
+REMOVE PREMIUM
+====================================================
+
+Always remove Premium Role.
+
+Even if database says user isn't Premium.
+
+Database missing must NOT stop role removal.
+
+====================================================
+AUTO EXPIRE
+====================================================
+
+Premium automatically expires.
+
+Remove Premium Role.
+
+Update dashboard.
+
+Send new log.
+
+====================================================
+PREMIUM LOG FORMAT
+====================================================
+
+Use embeds.
+
+No walls of text.
+
+Example
+
+👑 Premium Ditambahkan
+
+Member
+@Mention
+
+Durasi
+30 Hari
+
+Aktif Mulai
+13 Juli 2026 • 21:20 WIB
+
+Berakhir
+12 Agustus 2026 • 21:20 WIB
+
+Admin
+@Mention
+
+Status
+✅ Berhasil
+
+Permanent example
+
+Durasi
+
+Lifetime
+
+Berakhir
+
+♾
+
+====================================================
+REMOVE PREMIUM LOG
+====================================================
+
+❌ Premium Dihapus
+
+Member
+
+Admin
+
+Waktu
+
+Status
+
+====================================================
+AUTO EXPIRE LOG
+====================================================
+
+⌛ Premium Berakhir
+
+Member
+
+Expired
+
+Diproses
+
+System
+
+Status
+
+====================================================
+SET LIMIT
+====================================================
+
+Current Free Role still receives
+
+10 requests/day
+
+Auto reset every day.
+
+DO NOT CHANGE THIS.
+
+Improve command.
+
+Syntax
+
+/setlimit target limit duration
+
+Examples
+
+/setlimit @User 30 7d
+
+/setlimit @Role 100 30d
+
+/setlimit @User 50 12h
+
+/setlimit @User 100 30m
+
+/setlimit @VIP 9999 1
+
+If duration has no suffix
+
+Permanent.
+
+Same rules as Premium.
+
+====================================================
+RESET LIMIT
+====================================================
+
+Keep command.
+
+Improve logs.
+
+====================================================
+LIMIT LOG FORMAT
+====================================================
+
+🎵 Limit Diperbarui
+
+Target
+
+Limit
+
+Duration
+
+Started
+
+Expire
+
+Admin
+
+Status
+
+Permanent
+
+Duration
+
+Lifetime
+
+Expire
+
+♾
+
+====================================================
+MONITORING DASHBOARD
+====================================================
+
+Only ONE dashboard message.
+
+Always edit this message.
+
+Never spam.
+
+Dashboard contains
+
+Title
+
+Premium Monitoring
+
+Last Update
+
+Premium Active
+
+Custom Limit Active
+
+Statistics
+
+Permanent Premium
+
+Temporary Premium
+
+Permanent Custom Limit
+
+Temporary Custom Limit
+
+DO NOT display database information.
+
+DO NOT display debug information.
+
+====================================================
+BUTTONS
+====================================================
+
+Dashboard buttons
+
+👑 Premium
+
+🎵 Custom Limit
+
+🔄 Refresh
+
+====================================================
+BUTTON PREMIUM
+====================================================
+
+DO NOT edit dashboard.
+
+Instead send EPHEMERAL response.
+
+Only visible to the person clicking.
+
+Premium List
+
+Page 1 / X
+
+Example
+
+① @Member
+💎 Lifetime
+
+② @Member
+🟢 30 Hari
+
+③ @Member
+🟡 7 Hari
+
+④ @Member
+🟠 3 Hari
+
+⑤ @Member
+🔴 5 Jam
+
+Buttons
+
+⬅
+
+➡
+
+📄 Pilih Halaman
+
+====================================================
+PAGE SELECT
+====================================================
+
+When clicking
+
+📄 Pilih Halaman
+
+Open String Select Menu.
+
+Example
+
+Page 1
+
+Page 2
+
+Page 3
+
+...
+
+User can jump directly.
+
+====================================================
+CUSTOM LIMIT BUTTON
+====================================================
+
+Same system.
+
+Ephemeral.
+
+Example
+
+① @VIP
+💎 Unlimited
+
+② @Booster
+💎 Unlimited
+
+③ @User
+30 Request/Hari
+
+④ @Role
+100 Request/Hari
+
+Supports pages.
+
+====================================================
+REFRESH BUTTON
+====================================================
+
+Refresh dashboard.
+
+Recalculate all statistics.
+
+Update Last Update.
+
+====================================================
+AUTO UPDATE
+====================================================
+
+Dashboard automatically refreshes when
+
+/addprem
+
+/removeprem
+
+/setlimit
+
+/resetlimit
+
+Premium expired
+
+Bot restart
+
+Database changes
+
+====================================================
+VISUAL
+====================================================
+
+Modern embeds.
+
+Professional.
+
+Clean spacing.
+
+Good emojis.
+
+No excessive text.
+
+No giant paragraphs.
+
+====================================================
+IMPORTANT
+====================================================
+
+Do NOT break existing commands.
+
+Do NOT change Keylogger Scanner.
+
+Do NOT change BoomBox logic.
+
+Do NOT change current Premium system except improvements above.
+
+Maintain backward compatibility.
+
+After implementation, verify every command works without duplicate messages, duplicate events, duplicate logs, or duplicate dashboard updates.
+
+Finally, provide a summary of every modified file and every new feature implemented.

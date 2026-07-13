@@ -1,0 +1,198 @@
+PERBAIKI FITUR BOOMBOX SECARA MENYELURUH TANPA MERUSAK FITUR YANG SUDAH ADA.
+
+Masalah saat ini:
+
+Error:
+"Sign in to confirm you're not a bot"
+"Login Required"
+"Video memerlukan login atau dibatasi usia"
+
+Error berasal dari downloader YouTube (yt-dlp), BUKAN dari Discord Bot.
+
+Yang harus diperbaiki:
+
+━━━━━━━━━━━━━━━━━━
+1. UPDATE DOWNLOADER
+━━━━━━━━━━━━━━━━━━
+
+- Update yt-dlp ke versi terbaru.
+- Jangan memakai command lama.
+- Pastikan kompatibel dengan Node.js terbaru.
+
+━━━━━━━━━━━━━━━━━━
+2. AUTO FALLBACK
+━━━━━━━━━━━━━━━━━━
+
+Jangan berhenti ketika method pertama gagal.
+
+Urutan:
+
+Method 1
+yt-dlp
+
+↓
+
+Method 2
+Cobalt API
+
+↓
+
+Method 3
+Invidious
+
+↓
+
+Method 4
+Piped
+
+↓
+
+Method 5
+Backend cadangan
+
+Jika semua gagal baru kirim pesan gagal.
+
+━━━━━━━━━━━━━━━━━━
+3. RETRY
+━━━━━━━━━━━━━━━━━━
+
+Tambahkan retry otomatis.
+
+Contoh:
+
+Attempt 1
+
+↓
+
+Attempt 2
+
+↓
+
+Attempt 3
+
+Baru gagal.
+
+━━━━━━━━━━━━━━━━━━
+4. TIKTOK
+━━━━━━━━━━━━━━━━━━
+
+Pisahkan downloader TikTok.
+
+Jangan menggunakan downloader YouTube.
+
+Harus support:
+
+https://vt.tiktok.com/
+
+https://www.tiktok.com/
+
+https://vm.tiktok.com/
+
+https://m.tiktok.com/
+
+━━━━━━━━━━━━━━━━━━
+5. YOUTUBE
+━━━━━━━━━━━━━━━━━━
+
+Support semua format:
+
+youtube.com/watch?v=
+
+youtu.be/
+
+youtube.com/shorts/
+
+music.youtube.com/
+
+playlist (ambil video pertama)
+
+━━━━━━━━━━━━━━━━━━
+6. VALIDASI LINK
+━━━━━━━━━━━━━━━━━━
+
+Perbaiki validator.
+
+Jangan lagi muncul:
+
+Unsupported URL
+
+padahal link valid.
+
+━━━━━━━━━━━━━━━━━━
+7. LOG DOWNLOAD
+━━━━━━━━━━━━━━━━━━
+
+Tambahkan log:
+
+Platform
+
+Method yang dipakai
+
+Attempt ke-
+
+Durasi download
+
+Ukuran file
+
+Fallback aktif atau tidak
+
+━━━━━━━━━━━━━━━━━━
+8. AUTO UPDATE
+━━━━━━━━━━━━━━━━━━
+
+Saat bot start:
+
+cek versi yt-dlp
+
+jika ada update
+
+otomatis update.
+
+━━━━━━━━━━━━━━━━━━
+9. ERROR
+━━━━━━━━━━━━━━━━━━
+
+Jangan tampilkan:
+
+Login Required
+
+kepada user.
+
+Sebagai gantinya tampilkan:
+
+❌ BoomBox Gagal
+
+Penyebab:
+Video tidak dapat diproses oleh server.
+
+Bot sedang mencoba server cadangan...
+
+Jika seluruh server gagal:
+
+❌ BoomBox Gagal
+
+Semua server downloader sedang tidak tersedia.
+
+Silakan coba lagi beberapa menit lagi.
+
+━━━━━━━━━━━━━━━━━━
+10. JANGAN MERUSAK
+━━━━━━━━━━━━━━━━━━
+
+JANGAN mengubah:
+
+✔ Limit
+✔ Premium
+✔ Monitoring
+✔ Logs
+✔ Panel
+✔ Database
+✔ Command
+✔ Embed
+✔ Button
+✔ Role
+✔ Permission
+
+Hanya perbaiki sistem downloader BoomBox.
+
+Pastikan YouTube dan TikTok dapat diproses secara otomatis dengan sistem fallback sehingga jika satu downloader gagal, bot langsung berpindah ke downloader berikutnya tanpa campur tangan pengguna.
