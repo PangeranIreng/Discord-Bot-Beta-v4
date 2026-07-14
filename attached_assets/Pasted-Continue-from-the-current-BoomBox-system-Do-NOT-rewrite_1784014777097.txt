@@ -1,0 +1,213 @@
+Continue from the current BoomBox system. Do NOT rewrite or remove any existing BoomBox features. Only improve and fix the current implementation.
+
+========================
+1. KEEP CURRENT RESULT UI
+========================
+
+Do NOT change the final "BoomBox Ready" embed.
+
+Keep:
+- Song Title
+- Platform
+- Duration
+- BoomBox URL
+- Daily Limit / Premium
+- Processing Time
+- Open Button
+- Copy URL
+
+The final user result should stay exactly like the current design.
+
+========================
+2. SMOOTH USER EXPERIENCE
+========================
+
+Current flow:
+
+User sends YouTube link.
+Bot deletes user's message.
+
+Improve the flow:
+
+Immediately send ONE temporary embed.
+
+Example:
+
+🎵 Processing BoomBox...
+Please wait...
+
+Edit the SAME embed instead of sending multiple messages.
+
+Example status:
+
+🎵 Processing BoomBox...
+Fetching video...
+
+↓
+
+🎵 Processing BoomBox...
+Extracting audio...
+
+↓
+
+If YouTube blocks:
+
+🎵 Processing BoomBox...
+Trying another method...
+
+↓
+
+If recovery is needed:
+
+🎵 Processing BoomBox...
+Recovering download...
+
+↓
+
+Finally edit the SAME message into the normal BoomBox Ready embed.
+
+Requirements:
+
+- Never spam multiple messages.
+- Always edit the same message.
+- Smooth transitions.
+- Small delay (300~700ms) between edits.
+- Professional looking process.
+
+========================
+3. FIX YOUTUBE ANTI-BOT
+========================
+
+Improve BoomBox recovery.
+
+Requirements:
+
+- If extractor A fails, automatically try extractor B.
+- If extractor B fails, try another supported method.
+- Retry multiple safe methods before failing.
+- Never crash the bot.
+- If one recovery succeeds, continue normally.
+- Only show BoomBox Failed after ALL recovery methods fail.
+- Keep stack traces inside developer/error logs only.
+- Users should only see a clean error message.
+
+========================
+4. REAL PROCESSING TIME
+========================
+
+Measure the actual processing time.
+
+Do NOT always display:
+
+0.0 Seconds
+
+Display the real duration.
+
+Example:
+
+2.8 Seconds
+
+5.1 Seconds
+
+9.4 Seconds
+
+========================
+5. BOOMBOX LOGS
+========================
+
+Every successful BoomBox URL MUST automatically be sent to the BoomBox Logs channel.
+
+Only display:
+
+🎵 Song Title
+
+🔗 BoomBox URL
+
+🕒 Created Time
+
+Do NOT display:
+
+- User
+- YouTube Source
+- Platform
+- Processing Time
+
+Example:
+
+🎵 Alan Walker - Faded
+
+🔗 https://.....
+
+🕒 14 Jul 2026 • 20:31 WIB
+
+========================
+6. BOOMBOX LOGS DASHBOARD
+========================
+
+Do NOT spam a new message for every URL.
+
+Create a BoomBox Logs dashboard similar to the Ticket Logs system.
+
+Use one editable message for each page.
+
+When a new BoomBox URL is created:
+
+- Edit the last page.
+- Append the new log.
+
+When the page reaches the maximum number of entries (example: 20 logs):
+
+Automatically create the next page.
+
+Buttons:
+
+◀️ Previous
+
+▶️ Next
+
+🔄 Refresh
+
+(No Clear Logs button.)
+
+Dropdown:
+
+📂 BB Page
+
+• Page 1
+• Page 2
+• Page 3
+...
+
+Navigation must use message editing.
+
+========================
+7. PERFORMANCE
+========================
+
+Optimize the BoomBox process.
+
+Reduce waiting time where possible.
+
+Improve queue handling.
+
+Keep compatibility with all existing commands.
+
+========================
+8. IMPORTANT
+========================
+
+DO NOT remove or rewrite existing features.
+
+DO NOT change:
+
+- Ticket System
+- Bug Report System
+- Premium System
+- Keylogger Scanner
+- Admin Panel
+- Existing Database Structure
+- Existing Commands
+
+Only improve the BoomBox system and BoomBox Logs.
+
+Maintain full backward compatibility.

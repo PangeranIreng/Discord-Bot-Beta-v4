@@ -150,6 +150,15 @@ function effectiveDailyLimit(member) {
 
 // ── Cleanup ───────────────────────────────────────────────────────────────────
 
+/** Small delay so status transitions read as a smooth process instead of an
+ * instant flicker, per spec (300–700ms between edits). */
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function smoothDelay() {
+  return sleep(300 + Math.floor(Math.random() * 400)); // 300–700ms
+}
+
 function tryCleanup(tmpDir) {
   if (!tmpDir) return;
   try {
@@ -330,32 +339,14 @@ export async function handleBoomBoxMessage(message) {
     }
   }
 
-  // ── [2] Pre-check: fetch metadata (fast, no download) ────────────────────
-  // Same URL cached from a recent request? Reuse its metadata + skip the
-  // network fetch too.
-  let currentStage = "Fetch Video Info";
-  const cachedEarly = getCachedResult(url);
-  const info = cachedEarly ? cachedEarly.ytResult : await getVideoInfo(url);
-  if (cachedEarly) {
-    logger.info(`[BoomBox] Cache hit for ${url} — reusing metadata`);
-  } else {
-    logger.info(`[BoomBox] Fetching video info (simulate)...`);
-  }
-  logger.info(`[BoomBox] Video info | title="${info.title}" duration=${info.duration}s`);
-
-  // Duration limit — reject BEFORE downloading
-  if (info.duration !== null && info.duration > MAX_DURATION_SEC) {
-    logger.info(`[BoomBox] Rejected: duration ${info.duration}s > ${MAX_DURATION_SEC}s limit`);
-    await message.channel.send({ content: userMention, embeds: [buildDurationLimitEmbed(info.duration, MAX_DURATION_SEC)] }).catch(() => {});
-    processingSet.delete(message.id);
-    return;
-  }
-
-  // ── [3] Send initial processing embed ────────────────────────────────────
-  currentStage = "Send Processing Embed";
+  // ── [2] Send ONE temporary status embed immediately ───────────────────────
+  // Everything after this point edits this same message — never sends a new
+  // one — so the channel never gets spammed with progress messages.
+  let currentStage = "Send Processing Embed";
   let statusMsg;
+  let lastThumbnail = null;
   try {
-    statusMsg = await message.channel.send({ content: userMention, embeds: [buildProcessingEmbed(0, info.thumbnail)] });
+    statusMsg = await message.channel.send({ content: userMention, embeds: [buildProcessingEmbed(0, null)] });
   } catch (e) {
     logger.error(`[BoomBox] Failed to send processing embed: ${e.message}`);
     await logError({ feature: "BoomBox", reason: `Failed to send processing embed: ${e.message}`, stage: currentStage, error: e });
@@ -366,18 +357,42 @@ export async function handleBoomBoxMessage(message) {
   const startedAt = Date.now();
   let   tmpDir    = null;
 
-  // Fire-and-forget progress edits — editStep never throws (catches
-  // internally), so not awaiting shaves the Discord round-trip off the
-  // critical path without risking an unhandled rejection.
-  const editStep = async (step) => {
+  // Awaited (not fire-and-forget) + a small randomized delay so status
+  // transitions read as a smooth, professional-looking process instead of a
+  // flicker, per spec. editStep never throws (catches internally).
+  const editStep = async (step, labelOverride = null) => {
     try {
-      await statusMsg.edit({ content: userMention, embeds: [buildProcessingEmbed(step, info.thumbnail)], components: [] });
+      await statusMsg.edit({ content: userMention, embeds: [buildProcessingEmbed(step, lastThumbnail, labelOverride)], components: [] });
+      await smoothDelay();
     } catch (e) {
       logger.debug(`[BoomBox] Edit step ${step} failed (non-fatal): ${e.message}`);
     }
   };
 
   try {
+
+    // ── [3] Fetching video metadata ──────────────────────────────────────
+    // Same URL cached from a recent request? Reuse its metadata + skip the
+    // network fetch too.
+    currentStage = "Fetch Video Info";
+    await editStep(1); // "Fetching video..."
+    const cachedEarly = getCachedResult(url);
+    const info = cachedEarly ? cachedEarly.ytResult : await getVideoInfo(url);
+    lastThumbnail = info.thumbnail ?? null;
+    if (cachedEarly) {
+      logger.info(`[BoomBox] Cache hit for ${url} — reusing metadata`);
+    } else {
+      logger.info(`[BoomBox] Fetching video info (simulate)...`);
+    }
+    logger.info(`[BoomBox] Video info | title="${info.title}" duration=${info.duration}s`);
+
+    // Duration limit — reject BEFORE downloading
+    if (info.duration !== null && info.duration > MAX_DURATION_SEC) {
+      logger.info(`[BoomBox] Rejected: duration ${info.duration}s > ${MAX_DURATION_SEC}s limit`);
+      await statusMsg.edit({ content: userMention, embeds: [buildDurationLimitEmbed(info.duration, MAX_DURATION_SEC)], components: [] }).catch(() => {});
+      processingSet.delete(message.id);
+      return;
+    }
 
     let ytResult, boomboxUrl;
     const cached = getCachedResult(url);
@@ -389,23 +404,33 @@ export async function handleBoomBoxMessage(message) {
       ytResult   = cached.ytResult;
       boomboxUrl = cached.boomboxUrl;
     } else {
-      // ── [4] Downloading ─────────────────────────────────────────────────
+      // ── [4] Downloading / extracting audio ───────────────────────────────
+      // onProgress lets the retry loop inside ytdl() (multi-method YouTube/
+      // TikTok fallback, last-resort recovery engine) push live status text
+      // ("Trying another method...", "Recovering download...") onto this
+      // same message instead of leaving the user staring at a frozen embed.
       currentStage = "Download Audio";
-      editStep(1);
+      await editStep(2); // "Extracting audio..."
       logger.info(`[BoomBox] ── Downloading | ${platform} | ${url}`);
-      ytResult = await ytdl(url, BOOMBOX_CONFIG.AUDIO_TYPE, BOOMBOX_CONFIG.AUDIO_QUALITY);
+      ytResult = await ytdl(
+        url,
+        BOOMBOX_CONFIG.AUDIO_TYPE,
+        BOOMBOX_CONFIG.AUDIO_QUALITY,
+        (label) => editStep(2, label),
+      );
       tmpDir = ytResult.tmpDir;
+      lastThumbnail = ytResult.thumbnail ?? lastThumbnail;
       logger.info(`[BoomBox] ── Download complete | title="${ytResult.title}" duration=${ytResult.duration}s`);
 
       // ── [5] Uploading ───────────────────────────────────────────────────
       currentStage = "Upload to Top4Top";
-      editStep(2);
+      await editStep(3);
       logger.info(`[BoomBox] ── Upload started | file=${ytResult.localFile}`);
       const t4tResult = await top4top(ytResult.localFile);
 
       // ── [6] BoomBox URL ─────────────────────────────────────────────────
       currentStage = "Generate BoomBox URL";
-      editStep(3);
+      await editStep(4);
       boomboxUrl = t4tResult.result;
       logger.info(`[BoomBox] ── Upload finished | BoomBox URL created: ${boomboxUrl}`);
 

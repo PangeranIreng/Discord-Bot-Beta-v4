@@ -2,7 +2,7 @@
  * boomboxLogInteraction.js — Handles all Discord interactions whose customId
  * starts with "bblog:" (BoomBox Logs dashboard nav buttons + page select).
  *
- *   bblog:nav:<first|prev|refresh|next|last>:<page>
+ *   bblog:nav:<prev|refresh|next>:<page>
  *   bblog:pagesel  (select, value = page number string)
  */
 
@@ -14,15 +14,13 @@ export async function handleBoomBoxLogInteraction(interaction) {
   const id = interaction.customId ?? "";
 
   try {
-    const navMatch = /^bblog:nav:(first|prev|refresh|next|last):(\d+)$/.exec(id);
+    const navMatch = /^bblog:nav:(prev|refresh|next):(\d+)$/.exec(id);
     if (navMatch) {
       const [, action, curPageStr] = navMatch;
       const curPage = Number(curPageStr);
       let page = curPage;
-      if (action === "first")        page = 1;
-      else if (action === "prev")    page = Math.max(1, curPage - 1);
+      if (action === "prev")    page = Math.max(1, curPage - 1);
       else if (action === "next")    page = curPage + 1;
-      else if (action === "last")    page = Number.MAX_SAFE_INTEGER; // clamped inside builders
       // "refresh" keeps the current page as-is.
 
       const entries = db.getLogState().entries ?? [];

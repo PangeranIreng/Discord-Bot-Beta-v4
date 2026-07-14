@@ -50,26 +50,32 @@ export function truncateTitle(title, maxLen = 40) {
 // ── Processing Embed (progress bar, edited at each step) ─────────────────────
 
 const STEPS = [
-  { bar: "████░░░░░░", label: "Preparing..."             },
-  { bar: "██████░░░░", label: "Downloading Audio..."      },
-  { bar: "████████░░", label: "Uploading to Top4Top..."   },
+  { bar: "██░░░░░░░░", label: "Please wait..."            },
+  { bar: "████░░░░░░", label: "Fetching video..."          },
+  { bar: "██████░░░░", label: "Extracting audio..."        },
+  { bar: "████████░░", label: "Uploading to Top4Top..."    },
   { bar: "██████████", label: "Generating BoomBox URL..."  },
-  { bar: "██████████", label: "Finished."                 },
+  { bar: "██████████", label: "Finished."                  },
 ];
 
 /**
  * Build the processing embed for a given pipeline step.
  * Edit the SAME reply message at each step — never send a new one.
  *
- * @param {0|1|2|3|4} stepIndex  0=Preparing 1=Downloading 2=Uploading 3=URL 4=Finished
- * @param {string|null} thumbnail  Optional thumbnail URL (shown from step 1 onward)
+ * @param {0|1|2|3|4|5} stepIndex  0=Please wait 1=Fetching 2=Extracting 3=Uploading 4=URL 5=Finished
+ * @param {string|null} thumbnail  Optional thumbnail URL (shown once known)
+ * @param {string|null} labelOverride  Transient status text (e.g. "Trying another
+ *   method...", "Recovering download...") shown instead of the step's default
+ *   label, while keeping that step's progress bar level. Used during the
+ *   YouTube/TikTok multi-method retry loop so the user sees real-time status
+ *   without the bar jumping around.
  */
-export function buildProcessingEmbed(stepIndex = 0, thumbnail = null) {
+export function buildProcessingEmbed(stepIndex = 0, thumbnail = null, labelOverride = null) {
   const { bar, label } = STEPS[Math.min(stepIndex, STEPS.length - 1)];
   const embed = new EmbedBuilder()
     .setColor(COLOR_PROCESSING)
-    .setTitle("🎵 BoomBox")
-    .setDescription(`\`${bar}\`\n${label}`)
+    .setTitle("🎵 Processing BoomBox...")
+    .setDescription(`\`${bar}\`\n${labelOverride ?? label}`)
     .setFooter({ text: FOOTER_TEXT });
   if (thumbnail) embed.setThumbnail(thumbnail);
   return embed;
@@ -166,25 +172,37 @@ export function buildErrorEmbed(err) {
 
 // ── BoomBox Logs Embed (archive channel — no requester info) ─────────────────
 
+/** Format an ISO timestamp as "14 Jul 2026 • 20:31 WIB" (Asia/Jakarta, UTC+7). */
+export function formatWIB(isoTimestamp) {
+  const date = new Date(isoTimestamp);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Jakarta",
+    day:      "2-digit",
+    month:    "short",
+    year:     "numeric",
+    hour:     "2-digit",
+    minute:   "2-digit",
+    hour12:   false,
+  }).formatToParts(date);
+  const get = (type) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("day")} ${get("month")} ${get("year")} • ${get("hour")}:${get("minute")} WIB`;
+}
+
 /**
  * One entry's block within the log embed description. Intentionally carries
- * NO user information (no username/mention/ID/avatar/nickname) — only the
- * BoomBox result itself, per the BoomBox Logs redesign spec. The "Source"
- * (platform) line is deliberately omitted per spec.
+ * NO user information (no username/mention/ID/avatar/nickname) and no
+ * duration/platform/processing-time — only Title, BoomBox URL, and Created
+ * time, exactly per the BoomBox Logs redesign spec.
  *
- * @param {{title: string, duration: number|null, boomboxUrl: string, timestamp: string}} entry
+ * @param {{title: string, boomboxUrl: string, timestamp: string}} entry
  */
 export function buildLogEntryBlock(entry) {
-  const ts = Math.floor(new Date(entry.timestamp).getTime() / 1000);
   return [
     `🎵 ${truncateTitle(entry.title, 60)}`,
     "",
-    `⏱ Duration : ${formatDuration(entry.duration)}`,
+    `🔗 ${entry.boomboxUrl}`,
     "",
-    `🔗 BoomBox URL`,
-    entry.boomboxUrl,
-    "",
-    `🕒 Created : <t:${ts}:R>`,
+    `🕒 ${formatWIB(entry.timestamp)}`,
   ].join("\n");
 }
 

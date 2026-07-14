@@ -21,7 +21,7 @@ import { buildLogEntryBlock, LOG_SEP } from "./boomboxEmbed.js";
 import { logger }               from "../utils/logger.js";
 
 const COLOR_LOG        = 0x3ba4ff;
-const PAGE_SIZE         = 5;
+const PAGE_SIZE         = 20;
 /** Discord hard-caps embed description at 4096 chars; stay comfortably under it. */
 const DESC_SAFE_LIMIT   = 3900;
 
@@ -55,25 +55,24 @@ export function buildLogDashboardEmbed(entries, requestedPage = 1) {
     .setTimestamp();
 }
 
+// Per spec: only Previous / Next / Refresh — no First/Last, no Clear Logs.
 function buildNavRow(page, totalPages) {
   return new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId(`bblog:nav:first:${page}`).setEmoji("⏮").setStyle(ButtonStyle.Secondary).setDisabled(page <= 1),
-    new ButtonBuilder().setCustomId(`bblog:nav:prev:${page}`).setEmoji("◀").setStyle(ButtonStyle.Secondary).setDisabled(page <= 1),
-    new ButtonBuilder().setCustomId(`bblog:nav:refresh:${page}`).setEmoji("🔄").setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId(`bblog:nav:next:${page}`).setEmoji("▶").setStyle(ButtonStyle.Secondary).setDisabled(page >= totalPages),
-    new ButtonBuilder().setCustomId(`bblog:nav:last:${page}`).setEmoji("⏭").setStyle(ButtonStyle.Secondary).setDisabled(page >= totalPages),
+    new ButtonBuilder().setCustomId(`bblog:nav:prev:${page}`).setEmoji("◀️").setLabel("Previous").setStyle(ButtonStyle.Secondary).setDisabled(page <= 1),
+    new ButtonBuilder().setCustomId(`bblog:nav:next:${page}`).setEmoji("▶️").setLabel("Next").setStyle(ButtonStyle.Secondary).setDisabled(page >= totalPages),
+    new ButtonBuilder().setCustomId(`bblog:nav:refresh:${page}`).setEmoji("🔄").setLabel("Refresh").setStyle(ButtonStyle.Secondary),
   );
 }
 
 function buildPageSelectRow(totalPages) {
   const options = Array.from({ length: Math.min(totalPages, 25) }, (_, i) => ({
-    label: `📁 BB Page ${i + 1}`,
+    label: `📂 BB Page — Page ${i + 1}`,
     value: `${i + 1}`,
   }));
   return new ActionRowBuilder().addComponents(
     new StringSelectMenuBuilder()
       .setCustomId("bblog:pagesel")
-      .setPlaceholder("📁 Pilih BB Page")
+      .setPlaceholder("📂 BB Page")
       .addOptions(options),
   );
 }

@@ -432,8 +432,9 @@ const YOUTUBE_METHODS = [
  * variant above was bot-gated or hit a signature-extraction regression.
  * @private
  */
-async function _ytdlCoreFallback(input, type, quality, tmpDir) {
+async function _ytdlCoreFallback(input, type, quality, tmpDir, onProgress) {
   logger.info(`[ytmp3gg] YouTube — trying fallback engine (@distube/ytdl-core)`);
+  await onProgress?.("Recovering download...");
 
   const info = await ytdlCore.getInfo(input, {
     requestOptions: {
@@ -478,7 +479,7 @@ async function _ytdlCoreFallback(input, type, quality, tmpDir) {
   return { title, thumbnail, uploader, duration, type, quality: String(quality), localFile: finalFile, tmpDir };
 }
 
-async function _ytdlYouTube(input, type, quality) {
+async function _ytdlYouTube(input, type, quality, onProgress) {
   const tmpDir    = fs.mkdtempSync(path.join(os.tmpdir(), "boombox-"));
   let   lastError = new Error("YouTube download gagal setelah semua metode dicoba");
 
@@ -487,6 +488,7 @@ async function _ytdlYouTube(input, type, quality) {
       try {
         for (const f of fs.readdirSync(tmpDir)) fs.unlinkSync(path.join(tmpDir, f));
       } catch {}
+      await onProgress?.("Trying another method...");
     }
 
     logger.info(`[ytmp3gg] YouTube — trying method ${i + 1}/${YOUTUBE_METHODS.length}`);
@@ -518,7 +520,7 @@ async function _ytdlYouTube(input, type, quality) {
   } catch {}
 
   try {
-    return await _ytdlCoreFallback(input, type, quality, tmpDir);
+    return await _ytdlCoreFallback(input, type, quality, tmpDir, onProgress);
   } catch (err) {
     logger.warn(`[ytmp3gg] Fallback engine also failed: ${err.message}`);
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
@@ -569,7 +571,7 @@ const TIKTOK_METHODS = [
   ],
 ];
 
-async function _ytdlTikTok(input, type, quality) {
+async function _ytdlTikTok(input, type, quality, onProgress) {
   const tmpDir    = fs.mkdtempSync(path.join(os.tmpdir(), "boombox-"));
   let   lastError = new Error("TikTok download gagal setelah semua metode dicoba");
 
@@ -581,6 +583,7 @@ async function _ytdlTikTok(input, type, quality) {
           fs.unlinkSync(path.join(tmpDir, f));
         }
       } catch {}
+      await onProgress?.("Trying another method...");
     }
 
     logger.info(`[ytmp3gg] TikTok — trying method ${i + 1}/${TIKTOK_METHODS.length}`);
@@ -611,9 +614,13 @@ async function _ytdlTikTok(input, type, quality) {
  * @param {string} input           Full URL
  * @param {"mp3"|"mp4"} type
  * @param {string|number} quality  Audio bitrate in kbps (128/320) or video resolution
+ * @param {(label: string) => (void|Promise<void>)} [onProgress]  Optional callback
+ *   invoked with a short human-readable status ("Trying another method...",
+ *   "Recovering download...") whenever the retry loop advances — lets the
+ *   caller edit the same Discord status message instead of guessing state.
  * @returns {Promise<{ title, thumbnail, uploader, duration, type, quality, localFile, tmpDir }>}
  */
-export async function ytdl(input, type = "mp3", quality = "128") {
+export async function ytdl(input, type = "mp3", quality = "128", onProgress = null) {
   await ensureBinary();
 
   const isTikTok = /tiktok\.com/i.test(input);
@@ -622,10 +629,10 @@ export async function ytdl(input, type = "mp3", quality = "128") {
   logger.info(`[ytmp3gg] ▶ Starting download | url="${resolvedInput}" type=${type} quality=${quality}`);
 
   if (isTikTok) {
-    return _ytdlTikTok(resolvedInput, type, quality);
+    return _ytdlTikTok(resolvedInput, type, quality, onProgress);
   }
 
-  return _ytdlYouTube(resolvedInput, type, quality);
+  return _ytdlYouTube(resolvedInput, type, quality, onProgress);
 }
 
 // ── Metadata-only pre-check (no download) ────────────────────────────────────
