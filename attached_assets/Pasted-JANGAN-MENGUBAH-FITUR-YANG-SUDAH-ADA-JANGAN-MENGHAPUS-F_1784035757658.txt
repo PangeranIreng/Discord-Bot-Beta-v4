@@ -1,0 +1,161 @@
+JANGAN MENGUBAH FITUR YANG SUDAH ADA.
+
+JANGAN MENGHAPUS FILE.
+
+JANGAN MENGUBAH UI.
+
+JANGAN MENGUBAH DATABASE.
+
+JANGAN MENGUBAH EMBED.
+
+JANGAN MENGUBAH COMMAND LAMA.
+
+Semua fitur yang sudah ada WAJIB tetap berjalan.
+
+==================================================
+1. FIX /CC
+==================================================
+
+Perbaiki command:
+
+/cc <jumlah>
+
+Hilangkan batas buatan bot.
+
+Command harus menerima angka berapa pun.
+
+Contoh:
+
+/cc 100
+
+/cc 1000
+
+/cc 5000
+
+/cc 10000
+
+Bot harus otomatis melakukan bulk delete bertahap mengikuti batas Discord API sampai jumlah yang diminta selesai atau chat habis.
+
+Hanya Owner ID dan Developer ID yang dapat menggunakan command ini.
+
+==================================================
+2. FIX BOOMBOX LOGS
+==================================================
+
+Perbaiki menu:
+
+📂 View All Pages
+
+Saat memilih:
+
+Page 2
+
+Page 3
+
+Page 4
+
+Embed masih tetap berada di Page 1.
+
+Perbaiki agar benar-benar berpindah ke halaman yang dipilih.
+
+Footer juga harus berubah sesuai halaman.
+
+Contoh:
+
+Page 1/4
+
+Page 2/4
+
+Page 3/4
+
+Page 4/4
+
+Tombol:
+
+⏮ First
+
+◀ Previous
+
+🔄 Refresh
+
+▶ Next
+
+⏭ Last
+
+📂 View All Pages
+
+harus bekerja sesuai halaman yang sedang aktif.
+
+Refresh juga tidak boleh kembali ke Page 1.
+
+==================================================
+3. OPTIMASI BOOMBOX
+==================================================
+
+BoomBox masih terasa lambat.
+
+Optimalkan proses BoomBox tanpa mengurangi kualitas hasil.
+
+Kurangi proses yang tidak diperlukan.
+
+Gunakan cache bila memungkinkan.
+
+Gunakan asynchronous processing agar respon lebih cepat.
+
+Pisahkan proses BoomBox dari proses Scanner sehingga keduanya tidak saling menghambat ketika digunakan bersamaan.
+
+Tetap pertahankan seluruh fitur BoomBox yang sudah ada.
+
+==================================================
+4. JANGAN MENGUBAH SCANNER
+==================================================
+
+Scanner tetap bekerja seperti sekarang.
+
+Jangan mengurangi kualitas analisis.
+
+Jangan menghapus fitur Scanner.
+
+Jika ada optimasi, lakukan hanya pada efisiensi proses tanpa mengurangi hasil analisis.
+
+==================================================
+5. PENTING
+==================================================
+
+Jangan mengubah:
+
+- Ticket
+- Scanner
+- BoomBox
+- Help
+- Premium
+- CPanel
+- Claim Ticket
+- Thread
+- Database
+- UI
+- Embed
+
+Perbaiki hanya poin yang disebutkan di atas.
+
+==================================================
+6. FINAL CHECK
+==================================================
+
+Sebelum pekerjaan selesai:
+
+✅ /cc menerima angka berapa pun.
+
+✅ View All Pages benar-benar berpindah halaman.
+
+✅ Semua tombol pagination bekerja.
+
+✅ BoomBox lebih cepat.
+
+✅ Scanner tetap berjalan normal.
+
+✅ Semua Slash Command tetap terdaftar.
+
+✅ Tidak ada error compile.
+
+Jangan tandai pekerjaan selesai sebelum semua poin di atas benar-benar berfungsi.

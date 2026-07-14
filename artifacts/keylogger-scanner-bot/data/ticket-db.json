@@ -4,9 +4,11 @@
     "panelMessageId": "1526320879917858888",
     "logsChannelId": "1524811019514286263",
     "dashboardMessageId": "1526320881339469939",
-    "mentionRoleId": "1462696203241132118"
+    "mentionRoleId": "1462696203241132118",
+    "claimChannelId": "1526557283092271114",
+    "claimRoleId": "1462696203241132118"
   },
-  "counter": 5,
+  "counter": 6,
   "tickets": [
     {
       "number": 1,
@@ -68,6 +70,19 @@
       "firstReplySent": false,
       "statusMessageId": "1526570546060591126",
       "controlMessageId": "1526570548287639655"
+    },
+    {
+      "number": 6,
+      "threadId": "1526576848526643210",
+      "userId": "1462685321262272664",
+      "handlerId": "1462685321262272664",
+      "status": "closed",
+      "createdAt": "2026-07-14T13:11:24.348Z",
+      "closedAt": "2026-07-14T13:12:36.161Z",
+      "durationMs": 71813,
+      "firstReplySent": true,
+      "statusMessageId": "1526576856692686880",
+      "controlMessageId": "1526576858806620300"
     }
   ]
 }
