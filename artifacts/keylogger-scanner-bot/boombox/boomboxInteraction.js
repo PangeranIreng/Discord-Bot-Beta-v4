@@ -3,9 +3,12 @@
  *
  * Button custom IDs:
  *   bm:url:<boomboxUrl>   →  Reply ephemerally with the BoomBox URL.
+ *   bm:detail:<id>        →  Reply ephemerally with full failure detail.
  */
 
 import { logger } from "../utils/logger.js";
+import { getErrorDetail } from "./boomboxErrorStore.js";
+import { buildErrorDetailEmbed } from "./boomboxEmbed.js";
 
 /**
  * Handle a Discord button interaction from BoomBox.
@@ -37,6 +40,29 @@ export async function handleBoomBoxInteraction(interaction) {
       ephemeral: true,
     }).catch(err => {
       logger.warn(`[BoomBox] Failed to reply to Show URL: ${err.message}`);
+    });
+    return;
+  }
+
+  // ── Show error detail ─────────────────────────────────────────────────────
+  if (id.startsWith("bm:detail:")) {
+    const detailId = id.slice("bm:detail:".length);
+    const detail = getErrorDetail(detailId);
+
+    if (!detail) {
+      await interaction.reply({
+        content: "❌ Detail sudah tidak tersedia (kedaluwarsa).",
+        ephemeral: true,
+      }).catch(() => {});
+      return;
+    }
+
+    logger.debug(`[BoomBox] Show error detail button | id=${detailId}`);
+    await interaction.reply({
+      embeds: [buildErrorDetailEmbed(detail)],
+      ephemeral: true,
+    }).catch(err => {
+      logger.warn(`[BoomBox] Failed to reply to Detail button: ${err.message}`);
     });
     return;
   }

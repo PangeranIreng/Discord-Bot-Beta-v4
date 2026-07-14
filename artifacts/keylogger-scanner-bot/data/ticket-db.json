@@ -6,7 +6,7 @@
     "dashboardMessageId": "1526320881339469939",
     "mentionRoleId": "1462696203241132118"
   },
-  "counter": 1,
+  "counter": 2,
   "tickets": [
     {
       "number": 1,
@@ -17,6 +17,17 @@
       "createdAt": "2026-07-13T20:15:57.226Z",
       "closedAt": "2026-07-13T20:16:26.005Z",
       "durationMs": 28779,
+      "firstReplySent": false
+    },
+    {
+      "number": 2,
+      "threadId": "1526500665424351292",
+      "userId": "1526499408282390619",
+      "handlerId": null,
+      "status": "open",
+      "createdAt": "2026-07-14T08:08:40.294Z",
+      "closedAt": null,
+      "durationMs": null,
       "firstReplySent": false
     }
   ]

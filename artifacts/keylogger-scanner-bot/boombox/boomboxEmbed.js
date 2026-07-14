@@ -170,6 +170,29 @@ export function buildErrorEmbed(err) {
     .setTimestamp();
 }
 
+/**
+ * Reveals the full (untruncated where possible) technical error for staff —
+ * shown ephemerally when the "🔍 Detail" button on a failed embed is
+ * clicked, instead of ever posting a stack trace into the channel itself.
+ *
+ * @param {{ message: string, stage: string, stack?: string }} detail
+ */
+export function buildErrorDetailEmbed(detail) {
+  const stackBlock = detail.stack
+    ? "```\n" + detail.stack.slice(0, 1000) + "\n```"
+    : "```\n" + detail.message.slice(0, 1000) + "\n```";
+
+  return new EmbedBuilder()
+    .setColor(COLOR_ERROR)
+    .setTitle("🔍 BoomBox Failure — Technical Detail")
+    .addFields(
+      { name: "📍 Stage",       value: String(detail.stage || "Unknown"), inline: true  },
+      { name: "📜 Detail",      value: stackBlock,                        inline: false },
+    )
+    .setFooter({ text: FOOTER_TEXT })
+    .setTimestamp();
+}
+
 // ── BoomBox Logs Embed (archive channel — no requester info) ─────────────────
 
 /** Format an ISO timestamp as "14 Jul 2026 • 20:31 WIB" (Asia/Jakarta, UTC+7). */

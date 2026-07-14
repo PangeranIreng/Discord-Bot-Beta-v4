@@ -6,9 +6,9 @@
     "2026-07-13": {}
   },
   "statistics": {
-    "total": 17,
+    "total": 19,
     "byPlatform": {
-      "YouTube": 17
+      "YouTube": 19
     }
   },
   "history": [
@@ -170,11 +170,43 @@
       "duration": 295,
       "limitRemaining": "Unlimited",
       "timestamp": "2026-07-13T20:41:48.452Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "DJ Penipu Hati X Bootleg Full Bass || Melodi Kece Asik Speed Up Enakeun Viral Tik Tok Terbaru 2026",
+      "originalUrl": "https://youtu.be/ZbBNDF5CGVQ?si=3dx5w0sCPui9p9mx",
+      "boomboxUrl": "https://b.top4top.io/m_3847awtfq0.mp3",
+      "duration": 276,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T08:13:25.008Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "DJ CINTA TAK TERPISAHKAN || DUH KANGMAS JANE AKU TRESNO LILAKNO AKU LUNGO VIRAL TIKTOK 2025‼️",
+      "originalUrl": "https://youtu.be/fnDFrw_G9FQ?si=aR27GUGxNVr5yhNX",
+      "boomboxUrl": "https://f.top4top.io/m_3847k8tpn0.mp3",
+      "duration": 296,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T08:15:51.000Z"
     }
   ],
   "logState": {
     "messageId": "1526256015941832776",
     "entries": [
+      {
+        "title": "DJ CINTA TAK TERPISAHKAN || DUH KANGMAS JANE AKU TRESNO LILAKNO AKU LUNGO VIRAL TIKTOK 2025‼️",
+        "duration": 296,
+        "boomboxUrl": "https://f.top4top.io/m_3847k8tpn0.mp3",
+        "timestamp": "2026-07-14T08:15:51.000Z"
+      },
+      {
+        "title": "DJ Penipu Hati X Bootleg Full Bass || Melodi Kece Asik Speed Up Enakeun Viral Tik Tok Terbaru 2026",
+        "duration": 276,
+        "boomboxUrl": "https://b.top4top.io/m_3847awtfq0.mp3",
+        "timestamp": "2026-07-14T08:13:25.008Z"
+      },
       {
         "title": "DJ ALUN ALUN NGANJUK VIRAL TIKTOK | OPO KANG MAS ORA NGERTENI KOE TAK KANGENI | DJ TIKTOK 2024",
         "platform": "YouTube",

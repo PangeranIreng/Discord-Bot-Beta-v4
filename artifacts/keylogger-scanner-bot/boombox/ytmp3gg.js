@@ -157,7 +157,7 @@ async function ensureBinary() {
  * One download attempt with a specific set of extra args.
  * @private
  */
-async function _attempt(input, type, quality, extraArgs, tmpDir) {
+async function _attempt(input, type, quality, extraArgs, tmpDir, timeoutMs = 120_000) {
   const outputTemplate = path.join(tmpDir, "audio.%(ext)s");
   const audioFmt = type === "mp4" ? "m4a" : "mp3";
   const audioQ   = type === "mp3" ? `${quality}K` : "0";
@@ -170,6 +170,13 @@ async function _attempt(input, type, quality, extraArgs, tmpDir) {
     "--audio-quality", audioQ,
     "--no-warnings",
     "--no-simulate",
+    // Let yt-dlp itself retry transient network/fragment hiccups (timeouts,
+    // connection resets) a couple of times BEFORE we give up on this method
+    // and move to the next one — most "failures" that look like anti-bot
+    // blocks are actually short-lived network blips, not a real block.
+    "--extractor-retries", "2",
+    "--fragment-retries",  "3",
+    "--retry-sleep",       "1",
     "--print", "%(id)s|||%(title)s|||%(duration)s|||%(uploader)s|||%(thumbnail)s",
     "-o", outputTemplate,
     ...extraArgs,
@@ -179,7 +186,7 @@ async function _attempt(input, type, quality, extraArgs, tmpDir) {
   logger.debug(`[ytmp3gg] Args: ${args.join(" ")}`);
 
   const { stdout, stderr } = await execFileAsync(BIN_PATH, args, {
-    timeout:   120_000,
+    timeout:   timeoutMs,
     maxBuffer: 10 * 1024 * 1024,
   });
 
@@ -382,47 +389,64 @@ export async function resolveTikTokUrl(url) {
 
 // ── YouTube multi-method fallback ─────────────────────────────────────────────
 //
-// YouTube frequently returns HTTP 403 for the default web client due to
-// signature/PO-token churn. Switching player client (android/ios/web_safari)
-// is the standard yt-dlp workaround -- tried in order, same pattern as the
-// TikTok fallback below.
+// Root cause investigation (verified by hand against the live yt-dlp binary
+// in this environment, not guessed from generic advice):
+//
+//   - yt-dlp's own DEFAULT extraction (no --extractor-args override) already
+//     resolves to the "android_vr" client internally and returns full
+//     audio-only formats (itags 139/140/249/251). This is the most reliable
+//     path and was being wasted as "just try it first" instead of being
+//     recognized as the real fix.
+//   - Pinning `player_client=ios` or `player_client=mweb` explicitly is
+//     CURRENTLY COUNTERPRODUCTIVE: both now require a GVS PO token this bot
+//     cannot mint, so YouTube serves zero playable audio/video URLs for them
+//     (storyboard images only) — every previous attempt on these clients was
+//     guaranteed to fail before it even ran.
+//   - `player_client=tv` hits YouTube's newer SABR-only signature-challenge
+//     gate; even with a JS runtime installed (see below) it still returns no
+//     playable formats in this environment.
+//   - `player_client=tv_embedded` is no longer a recognized client at all —
+//     yt-dlp silently ignores it and falls back to the same android_vr
+//     default (so it was never doing anything beyond wasting a full attempt
+//     + timeout).
+//   - `player_client=android` (explicit) DOES still work, but only exposes
+//     one muxed low-bitrate format (itag 18, ~44kbps) — worse quality than
+//     default, but a real, working fallback if default ever fails.
+//   - The missing-JS-runtime warning ("YouTube extraction without a JS
+//     runtime has been deprecated") was real and has been fixed at the
+//     system level by installing `deno` (see replit.md / environment setup)
+//     so yt-dlp can solve signature/n-parameter challenges going forward.
+//
+// Net effect: the fallback list below only keeps methods verified to
+// actually return playable formats, in order of quality — no more burning
+// time on client pins that are guaranteed to fail right now.
 
 const YOUTUBE_METHODS = [
-  // ── Method 1: Standard ── no special flags
+  // ── Method 1: yt-dlp's own default (no override) — resolves to
+  // android_vr internally, full audio-only formats, most reliable.
   [],
 
-  // ── Method 2: Android client (usually dodges 403 first)
+  // ── Method 2: android_vr pinned explicitly — insurance in case yt-dlp's
+  // default client selection changes upstream; same working formats as
+  // Method 1 without relying on "whatever the default currently is".
+  [
+    "--extractor-args", "youtube:player_client=android_vr",
+  ],
+
+  // ── Method 3: android client — verified working fallback, lower quality
+  // (single muxed itag 18, ~44kbps) but real audio, not a guaranteed fail.
   [
     "--extractor-args", "youtube:player_client=android",
     "--add-headers", "User-Agent:com.google.android.youtube/19.09.37 (Linux; U; Android 11) gzip",
   ],
-
-  // ── Method 3: iOS client
-  [
-    "--extractor-args", "youtube:player_client=ios",
-    "--add-headers", "User-Agent:com.google.ios.youtube/19.09.3 (iPhone14,3; U; CPU iOS 15_6 like Mac OS X)",
-  ],
-
-  // ── Method 4: web_safari client, desktop UA
-  [
-    "--extractor-args", "youtube:player_client=web_safari",
-    "--add-headers", "User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15",
-  ],
-
-  // ── Method 5: tv_embedded client — historically exempt from the
-  // "Sign in to confirm you're not a bot" PO-token gate that hits web/mweb.
-  [
-    "--extractor-args", "youtube:player_client=tv_embedded",
-  ],
-
-  // ── Method 6: mweb (mobile web) client, mobile UA — different rollout
-  // cohort than the desktop web client, sometimes unaffected when it is
-  // the one being bot-gated.
-  [
-    "--extractor-args", "youtube:player_client=mweb",
-    "--add-headers", "User-Agent:Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.82 Mobile Safari/537.36",
-  ],
 ];
+
+/** Per-method timeout — early methods fail fast so the retry loop doesn't
+ * burn minutes before reaching the client that actually works; the last
+ * one gets the full budget in case it just needs more time. */
+function _methodTimeout(i) {
+  return i < YOUTUBE_METHODS.length - 1 ? 45_000 : 120_000;
+}
 
 /**
  * Last-resort YouTube fallback using @distube/ytdl-core — a completely
@@ -493,7 +517,8 @@ async function _ytdlYouTube(input, type, quality, onProgress) {
 
     logger.info(`[ytmp3gg] YouTube — trying method ${i + 1}/${YOUTUBE_METHODS.length}`);
     try {
-      const stdout = await _attempt(input, type, quality, YOUTUBE_METHODS[i], tmpDir);
+      const stdout = await _attempt(input, type, quality, YOUTUBE_METHODS[i], tmpDir, _methodTimeout(i));
+      logger.info(`[ytmp3gg] YouTube method ${i + 1} succeeded — stopping fallback loop`);
       return _parseOutput(stdout, tmpDir, type, quality);
     } catch (err) {
       lastError = _translateError(err);
@@ -651,41 +676,54 @@ export async function getVideoInfo(url) {
   const resolvedUrl = isTikTok ? await resolveTikTokUrl(url) : url;
   logger.debug(`[ytmp3gg] getVideoInfo (simulate) | url="${resolvedUrl}"`);
 
-  // TikTok simulate also benefits from the extra headers
-  const extraArgs = isTikTok
-    ? [
+  // TikTok simulate also benefits from the extra headers.
+  // YouTube gets a couple of client fallbacks too — a bot-gated metadata
+  // fetch is non-fatal (the real ytdl() download call has its own full
+  // fallback loop), but skipping the fallback here would needlessly lose
+  // duration/thumbnail info that yt-dlp could otherwise recover in one try.
+  const infoMethods = isTikTok
+    ? [[
         "--no-check-certificates",
         "--add-headers", "User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "--add-headers", "Referer:https://www.tiktok.com/",
-      ]
-    : [];
+      ]]
+    : [
+        [], // yt-dlp default combo first
+        ["--extractor-args", "youtube:player_client=tv"],
+      ];
 
-  const args = [
-    "--no-playlist",
-    "--simulate",
-    "--no-warnings",
-    "--print", "%(duration)s|||%(title)s|||%(thumbnail)s|||%(uploader)s",
-    ...extraArgs,
-    resolvedUrl,
-  ];
+  for (let i = 0; i < infoMethods.length; i++) {
+    const args = [
+      "--no-playlist",
+      "--simulate",
+      "--no-warnings",
+      "--extractor-retries", "1",
+      "--print", "%(duration)s|||%(title)s|||%(thumbnail)s|||%(uploader)s",
+      ...infoMethods[i],
+      resolvedUrl,
+    ];
 
-  try {
-    const { stdout } = await execFileAsync(BIN_PATH, args, {
-      timeout:   30_000,
-      maxBuffer: 1 * 1024 * 1024,
-    });
-    const line            = stdout.trim().split("\n").find(l => l.includes("|||")) ?? "";
-    const [rawDur, rawTitle, rawThumb, rawUp] = line.split("|||");
-    const duration = rawDur && !isNaN(rawDur) ? parseInt(rawDur, 10) : null;
-    return {
-      duration,
-      title:     rawTitle?.trim() || null,
-      thumbnail: rawThumb?.trim() || null,
-      uploader:  rawUp?.trim()    || null,
-    };
-  } catch (err) {
-    logger.warn(`[ytmp3gg] getVideoInfo failed: ${err.message}`);
-    // Non-fatal — caller decides what to do
-    return { duration: null, title: null, thumbnail: null, uploader: null };
+    try {
+      const { stdout } = await execFileAsync(BIN_PATH, args, {
+        timeout:   20_000,
+        maxBuffer: 1 * 1024 * 1024,
+      });
+      const line            = stdout.trim().split("\n").find(l => l.includes("|||")) ?? "";
+      const [rawDur, rawTitle, rawThumb, rawUp] = line.split("|||");
+      const duration = rawDur && !isNaN(rawDur) ? parseInt(rawDur, 10) : null;
+      return {
+        duration,
+        title:     rawTitle?.trim() || null,
+        thumbnail: rawThumb?.trim() || null,
+        uploader:  rawUp?.trim()    || null,
+      };
+    } catch (err) {
+      logger.warn(`[ytmp3gg] getVideoInfo method ${i + 1}/${infoMethods.length} failed: ${err.message}`);
+    }
   }
+
+  // All methods failed — non-fatal, caller treats null duration as "unknown,
+  // proceed anyway" and the real ytdl() download call still gets its own
+  // full multi-method fallback.
+  return { duration: null, title: null, thumbnail: null, uploader: null };
 }

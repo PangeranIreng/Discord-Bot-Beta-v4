@@ -34,6 +34,7 @@ import {
   buildDurationLimitEmbed,
   buildErrorEmbed,
 } from "./boomboxEmbed.js";
+import { storeErrorDetail } from "./boomboxErrorStore.js";
 import { updateBoomBoxLogDashboard } from "./boomboxLogDashboard.js";
 import { logError } from "../utils/errorLogger.js";
 import { logger }   from "../utils/logger.js";
@@ -183,6 +184,17 @@ function buildButtons(boomboxUrl) {
     new ButtonBuilder()
       .setCustomId(`bm:url:${boomboxUrl}`)
       .setLabel("📋 Copy URL")
+      .setStyle(ButtonStyle.Secondary),
+  );
+}
+
+/** Shown only on a failed embed — reveals the full technical detail
+ * ephemerally on click instead of ever posting it into the channel. */
+function buildErrorDetailButton(detailId) {
+  return new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`bm:detail:${detailId}`)
+      .setLabel("🔍 Detail")
       .setStyle(ButtonStyle.Secondary),
   );
 }
@@ -478,7 +490,7 @@ export async function handleBoomBoxMessage(message) {
     const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
     logger.error(`[BoomBox] ❌ Failed after ${elapsed}s at [${currentStage}]: ${err.message}`);
 
-    // Send to global error logger
+    // Send to global error logger (full stack trace — error-log channel only)
     await logError({
       feature: `BoomBox — ${platform}`,
       reason:  err.message,
@@ -486,8 +498,17 @@ export async function handleBoomBoxMessage(message) {
       error:   err,
     });
 
+    // The channel embed itself never carries a stack trace — only the
+    // summarized reason/suggestion. Full detail is stashed here and only
+    // revealed ephemerally if someone clicks "🔍 Detail".
+    const detailId = storeErrorDetail({ message: err.message, stage: currentStage, stack: err.stack });
+
     try {
-      await statusMsg.edit({ content: userMention, embeds: [buildErrorEmbed(err)], components: [] });
+      await statusMsg.edit({
+        content:    userMention,
+        embeds:     [buildErrorEmbed(err)],
+        components: [buildErrorDetailButton(detailId)],
+      });
     } catch (editErr) {
       logger.error(`[BoomBox] Also failed to edit error reply: ${editErr.message}`);
     }
