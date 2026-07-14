@@ -23,7 +23,8 @@ import {
   buildPanelEmbed,
   buildPanelButtonRow,
   buildTicketStatusEmbed,
-  buildTicketButtons,
+  buildControlEmbed,
+  buildControlButtons,
 } from "./ticketEmbed.js";
 import { padTicketNumber } from "./ticketUtils.js";
 import { updateTicketDashboard } from "./ticketDashboard.js";
@@ -102,14 +103,16 @@ export async function openTicket(interaction) {
 
   const record = {
     number,
-    threadId:       thread.id,
-    userId:         interaction.user.id,
-    handlerId:      null,
-    status:         "open",
-    createdAt:      new Date().toISOString(),
-    closedAt:       null,
-    durationMs:     null,
-    firstReplySent: false,
+    threadId:         thread.id,
+    userId:           interaction.user.id,
+    handlerId:        null,
+    status:           "open",
+    createdAt:        new Date().toISOString(),
+    closedAt:         null,
+    durationMs:       null,
+    firstReplySent:   false,
+    statusMessageId:  null,
+    controlMessageId: null,
   };
   ticketDB.addTicket(record);
 
@@ -117,14 +120,42 @@ export async function openTicket(interaction) {
     await thread.send({ content: `<@&${config.mentionRoleId}>` }).catch(() => {});
   }
 
-  await thread.send({
-    embeds:     [buildTicketStatusEmbed(number, "open", null)],
-    components: [buildTicketButtons("open", number)],
-  });
+  // Thread message: plain status only, NO buttons — the requester shares
+  // this thread, so any component here would be visible to them too.
+  const statusMsg = await thread.send({ embeds: [buildTicketStatusEmbed(number, "open", null)] });
+  ticketDB.updateTicket(thread.id, { statusMessageId: statusMsg.id });
+
+  // Claim/Close controls live only in the staff-only Ticket Logs channel.
+  const logsChannel = await interaction.client.channels.fetch(config.logsChannelId).catch(() => null);
+  if (logsChannel?.isTextBased()) {
+    try {
+      const controlMsg = await logsChannel.send({
+        embeds:     [buildControlEmbed(number, "open", interaction.user.id, null)],
+        components: buildControlButtons("open", number),
+      });
+      ticketDB.updateTicket(thread.id, { controlMessageId: controlMsg.id });
+    } catch (e) {
+      logger.warn(`[Ticket] Gagal mengirim staff control message untuk Ticket #${number}: ${e.message}`);
+    }
+  }
 
   await interaction.editReply({ content: `✅ Ticket kamu telah dibuat: ${thread}` });
 
   await updateTicketDashboard(interaction.client);
+}
+
+/** Re-render the plain (button-free) status embed inside the ticket thread. */
+async function updateThreadStatus(client, ticket, status, handlerId) {
+  if (!ticket.statusMessageId) return;
+  try {
+    const thread = await client.channels.fetch(ticket.threadId).catch(() => null);
+    if (!thread) return;
+    const msg = await thread.messages.fetch(ticket.statusMessageId).catch(() => null);
+    if (!msg) return;
+    await msg.edit({ embeds: [buildTicketStatusEmbed(ticket.number, status, handlerId)] });
+  } catch (e) {
+    logger.debug(`[Ticket] Gagal update status thread #${ticket.number}: ${e.message}`);
+  }
 }
 
 // ── First user reply (auto-ack, once) ───────────────────────────────────
@@ -165,10 +196,17 @@ export async function claimTicket(interaction, ticketNumber) {
 
   ticketDB.updateTicket(ticket.threadId, { status: "claimed", handlerId: interaction.user.id });
 
+  // This button click always comes from the staff-only control message —
+  // interaction.update() edits that same message in place.
   await interaction.update({
-    embeds:     [buildTicketStatusEmbed(ticketNumber, "claimed", interaction.user.id)],
-    components: [buildTicketButtons("claimed", ticketNumber)],
+    embeds:     [buildControlEmbed(ticketNumber, "claimed", ticket.userId, interaction.user.id)],
+    components: buildControlButtons("claimed", ticketNumber),
   });
+
+  await updateThreadStatus(interaction.client, { ...ticket, status: "claimed" }, "claimed", interaction.user.id);
+
+  const thread = await interaction.client.channels.fetch(ticket.threadId).catch(() => null);
+  await thread?.send(`🟢 Ticket sedang di-handle oleh <@${interaction.user.id}>.`).catch(() => {});
 
   await updateTicketDashboard(interaction.client);
 }
@@ -199,12 +237,21 @@ export async function closeTicket(interaction, ticketNumber) {
   const durationMs = closedAt.getTime() - new Date(ticket.createdAt).getTime();
   ticketDB.updateTicket(ticket.threadId, { status: "closed", closedAt: closedAt.toISOString(), durationMs });
 
-  await interaction.update({
-    embeds:     [buildTicketStatusEmbed(ticketNumber, "closed", ticket.handlerId)],
-    components: [],
-  });
+  // Close can be triggered either from the staff control message (normal
+  // path) or, defensively, from any other context — only .update() the
+  // interaction's own message when it actually IS the control message.
+  if (ticket.controlMessageId && interaction.message?.id === ticket.controlMessageId) {
+    await interaction.update({
+      embeds:     [buildControlEmbed(ticketNumber, "closed", ticket.userId, ticket.handlerId)],
+      components: [],
+    });
+  } else {
+    await interaction.reply({ content: "✅ Ticket ditutup.", ephemeral: true }).catch(() => {});
+  }
 
-  const thread = interaction.channel;
+  await updateThreadStatus(interaction.client, ticket, "closed", ticket.handlerId);
+
+  const thread = await interaction.client.channels.fetch(ticket.threadId).catch(() => interaction.channel);
   try {
     await thread.setLocked(true, "Ticket ditutup");
     await thread.setArchived(true, "Ticket ditutup");

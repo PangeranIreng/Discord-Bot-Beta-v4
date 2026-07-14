@@ -1,0 +1,411 @@
+Continue from the current project.
+
+DO NOT rewrite the project.
+DO NOT remove any existing features.
+Only improve and fix the existing systems.
+
+==================================================
+1. KEEP CURRENT BOOMBOX RESULT UI
+==================================================
+
+Do NOT change the final BoomBox Ready embed.
+
+Keep:
+
+- Song Title
+- Platform
+- Duration
+- BoomBox URL
+- Daily Limit / Premium
+- Processing Time
+- Open URL Button
+- Copy URL Button
+
+The final result UI must remain the same.
+
+==================================================
+2. SMOOTH USER EXPERIENCE
+==================================================
+
+Current flow:
+
+User sends YouTube URL.
+
+Improve the experience.
+
+User sends link.
+
+↓
+
+Bot automatically deletes the user's message.
+
+↓
+
+Bot sends ONE temporary processing embed.
+
+Example:
+
+🎵 Processing BoomBox...
+
+↓
+
+Edit same embed
+
+🔍 Analyzing Link...
+
+↓
+
+Edit same embed
+
+⬇ Downloading Audio...
+
+↓
+
+Edit same embed
+
+🎵 Creating BoomBox URL...
+
+↓
+
+Edit same embed
+
+📤 Finalizing...
+
+Never spam multiple embeds.
+
+Always edit the same message.
+
+==================================================
+3. AFTER SUCCESS
+==================================================
+
+When BoomBox is finished:
+
+DO NOT edit the processing embed into the result.
+
+Instead:
+
+Delete the processing embed.
+
+Send a BRAND NEW BoomBox Ready message.
+
+Mention the user.
+
+Example:
+
+✅ BoomBox Ready
+
+<@User>
+
+Your BoomBox URL has been created successfully.
+
+Thank you for waiting.
+
+(Open URL)
+(Copy URL)
+
+This ensures the user receives a notification even if they switched to another Discord channel.
+
+==================================================
+4. QUEUE SYSTEM
+==================================================
+
+Create a real queue.
+
+Maximum:
+
+3~5 active BoomBox jobs simultaneously.
+
+Extra users automatically enter queue.
+
+Queue must be FIFO.
+
+When entering queue:
+
+Send an EPHEMERAL message.
+
+Only visible to that user.
+
+Example:
+
+⏳ BoomBox Queue
+
+Hi <@User>
+
+Your link has been received.
+
+Queue Position
+
+#4
+
+Estimated Wait
+
+18 Seconds
+
+Please wait.
+
+Your BoomBox URL will be generated automatically.
+
+Do NOT spam the channel.
+
+When queue position changes:
+
+Update the ephemeral message.
+
+When user's turn starts:
+
+Automatically remove the queue message.
+
+Start processing immediately.
+
+==================================================
+5. PERFORMANCE
+==================================================
+
+Optimize the BoomBox system.
+
+Goals:
+
+Average generation time:
+
+2~6 seconds when possible.
+
+Reduce unnecessary waiting.
+
+Use async processing.
+
+Use worker pool.
+
+Retry safely.
+
+Avoid duplicate YouTube requests.
+
+Use cache.
+
+If same YouTube video already has a valid BoomBox URL:
+
+Return cached URL instantly.
+
+==================================================
+6. MAX VIDEO LENGTH
+==================================================
+
+Maximum supported duration:
+
+25 Minutes
+
+If longer:
+
+Reject.
+
+Send:
+
+Video too long.
+
+Maximum supported duration is 25 minutes.
+
+==================================================
+7. FIX YOUTUBE ANTI BOT
+==================================================
+
+Do NOT only change error messages.
+
+Actually improve recovery.
+
+Requirements:
+
+Multiple extractor fallback.
+
+Retry.
+
+Alternative download methods.
+
+Automatic recovery.
+
+If one method succeeds:
+
+Continue normally.
+
+Only show failed after ALL methods fail.
+
+Never crash the bot.
+
+==================================================
+8. ERROR HANDLING
+==================================================
+
+Users should only see clean embeds.
+
+Developer log channel receives:
+
+Stack trace
+
+Method used
+
+Recovery result
+
+Reason
+
+==================================================
+9. BOOMBOX LOGS
+==================================================
+
+Keep BoomBox Logs.
+
+Every successful BoomBox automatically enters logs.
+
+Display:
+
+Song Title
+
+BoomBox URL
+
+Created Time
+
+No processing time.
+
+No platform.
+
+No unnecessary information.
+
+==================================================
+10. TICKET SYSTEM FIX
+==================================================
+
+Fix Ticket System.
+
+Current issues:
+
+User still sees Claim Ticket button.
+
+User cannot send messages after ticket creation.
+
+Requirements:
+
+USER VIEW
+
+User must NOT see Claim Ticket button.
+
+User opens ticket.
+
+User immediately can:
+
+Send messages
+
+Upload files
+
+Send images
+
+Use emojis
+
+Read history
+
+Ticket must never be read-only.
+
+STAFF VIEW
+
+Claim Ticket button only visible for:
+
+Ticket Handler
+
+Support
+
+Moderator
+
+Admin
+
+Developer
+
+Owner
+
+Members must never see Claim Ticket.
+
+After claim:
+
+Status becomes:
+
+🟢 Being Handled
+
+Display staff name.
+
+Disable Claim button.
+
+==================================================
+11. PERMISSIONS
+==================================================
+
+Ticket creator permissions:
+
+View Channel
+
+Send Messages
+
+Read History
+
+Attach Files
+
+Embed Links
+
+Add Reactions
+
+Use External Emojis
+
+Use Stickers
+
+Application Commands
+
+Staff keeps Full Access.
+
+Other members cannot view the ticket.
+
+==================================================
+12. DO NOT CHANGE
+==================================================
+
+Do NOT modify:
+
+Premium System
+
+Daily Limit
+
+Database
+
+Ticket Logs
+
+BoomBox Ready UI
+
+Buttons
+
+Monitoring
+
+Admin Panel
+
+Scanner
+
+Commands
+
+Role System
+
+Existing IDs
+
+Only improve:
+
+BoomBox
+
+BoomBox Queue
+
+BoomBox Performance
+
+BoomBox Recovery
+
+BoomBox Logs
+
+Ticket Permission
+
+Ticket Claim Visibility
+
+Ticket Chat
+
+Maintain full backward compatibility.
+
+Everything must continue working exactly as before while fixing the issues above.

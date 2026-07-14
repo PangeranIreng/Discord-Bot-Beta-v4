@@ -31,8 +31,9 @@ A Discord bot (discord.js v14) that automatically scans file attachments posted 
 ## Product
 
 - Auto-scans uploaded files for keylogger/malware indicators and posts a threat-assessment embed with Full Preview / Download / Copy Webhook / Copy Indicators / Scan Again buttons.
-- BoomBox: play/queue music in voice channels via YouTube/top4top downloads, with a premium tier synced to a Discord role.
-- Ticket and bug-report systems with their own commands and dashboards.
+- BoomBox: converts a YouTube/TikTok link to a BoomBox (top4top-hosted) audio URL. Bounded-concurrency FIFO queue (`boombox/boomboxQueue.js`, max 4 concurrent jobs); overflow waits with a private DM queue notice (position/ETA), falling back to one edited channel message if DMs are closed. On success the processing embed is deleted and a brand-new @mention message is sent (not edited), so users get a real notification even from another channel.
+- Ticket system: Claim/Close buttons live only in the staff-only Ticket Logs channel (a separate "Staff Controls" message per ticket) — the shared ticket thread only ever shows plain status text, since Discord threads can't hide components from specific viewers.
+- Bug-report system with its own commands and dashboard.
 
 ## User preferences
 

@@ -87,28 +87,74 @@ export function buildTicketStatusEmbed(ticketNumber, status, handlerId) {
     .setTimestamp();
 }
 
+// ── Staff-only control message (posted in the logs channel, NOT the thread) ─
+//
+// Discord has no concept of "show this button to some viewers of a message
+// but not others" — everyone with access to a channel/thread sees the same
+// components. Since a ticket thread is shared with the requester, the
+// Claim/Close buttons cannot live there without the requester also seeing
+// them. Instead they live on a separate message in the (staff-only) Ticket
+// Logs channel; the thread itself only ever shows plain status text.
+
+/**
+ * @param {number} ticketNumber
+ * @param {"open"|"claimed"|"closed"} status
+ * @param {string} userId      Ticket creator
+ * @param {string|null} handlerId
+ */
+export function buildControlEmbed(ticketNumber, status, userId, handlerId) {
+  const statusLine =
+    status === "open"    ? "🟡 Menunggu Handle..." :
+    status === "claimed" ? "🟢 Being Handled" :
+                            "🔴 Closed";
+
+  const color =
+    status === "open"    ? COLOR_OPEN :
+    status === "claimed" ? COLOR_CLAIMED :
+                            COLOR_CLOSED;
+
+  const fields = [
+    { name: "Requester", value: `<@${userId}>`, inline: true },
+    { name: "Status",    value: statusLine,     inline: true },
+  ];
+  if (handlerId) fields.push({ name: "Handled by", value: `<@${handlerId}>`, inline: true });
+
+  return new EmbedBuilder()
+    .setColor(color)
+    .setTitle(`🎫 Ticket #${padTicketNumber(ticketNumber)} — Staff Controls`)
+    .addFields(fields)
+    .setFooter({ text: FOOTER_TEXT })
+    .setTimestamp();
+}
+
 /**
  * Claim button while open, Close button while claimed, no buttons once closed.
+ * Only ever rendered in the staff-only control message.
  * @param {"open"|"claimed"|"closed"} status
  */
-export function buildTicketButtons(status, ticketNumber) {
+export function buildControlButtons(status, ticketNumber) {
   if (status === "open") {
-    return new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`ticket:claim:${ticketNumber}`)
-        .setLabel("Claim Ticket")
-        .setEmoji("✅")
-        .setStyle(ButtonStyle.Success),
-    );
+    return [
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`ticket:claim:${ticketNumber}`)
+          .setLabel("Claim Ticket")
+          .setEmoji("✅")
+          .setStyle(ButtonStyle.Success),
+      ),
+    ];
   }
   if (status === "claimed") {
-    return new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`ticket:close:${ticketNumber}`)
-        .setLabel("Close Ticket")
-        .setEmoji("🔒")
-        .setStyle(ButtonStyle.Danger),
-    );
+    return [
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setCustomId(`ticket:close:${ticketNumber}`)
+          .setLabel("Close Ticket")
+          .setEmoji("🔒")
+          .setStyle(ButtonStyle.Danger)
+          .setDisabled(false),
+      ),
+    ];
   }
-  return null; // closed — no actionable buttons
+  return []; // closed — no actionable buttons
 }

@@ -6,9 +6,9 @@
     "2026-07-13": {}
   },
   "statistics": {
-    "total": 19,
+    "total": 20,
     "byPlatform": {
-      "YouTube": 19
+      "YouTube": 20
     }
   },
   "history": [
@@ -190,11 +190,27 @@
       "duration": 296,
       "limitRemaining": "Unlimited",
       "timestamp": "2026-07-14T08:15:51.000Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "ABBA - The Winner Takes It All (Lyrics)",
+      "originalUrl": "https://youtu.be/594smhY4o6U?si=ZE1JglCN49aWMIYw",
+      "boomboxUrl": "https://j.top4top.io/m_38479eiu40.mp3",
+      "duration": 296,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T08:55:00.881Z"
     }
   ],
   "logState": {
     "messageId": "1526256015941832776",
     "entries": [
+      {
+        "title": "ABBA - The Winner Takes It All (Lyrics)",
+        "duration": 296,
+        "boomboxUrl": "https://j.top4top.io/m_38479eiu40.mp3",
+        "timestamp": "2026-07-14T08:55:00.881Z"
+      },
       {
         "title": "DJ CINTA TAK TERPISAHKAN || DUH KANGMAS JANE AKU TRESNO LILAKNO AKU LUNGO VIRAL TIKTOK 2025‼️",
         "duration": 296,

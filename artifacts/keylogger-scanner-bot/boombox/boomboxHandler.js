@@ -33,9 +33,11 @@ import {
   buildResultEmbed,
   buildDurationLimitEmbed,
   buildErrorEmbed,
+  buildQueueEmbed,
 } from "./boomboxEmbed.js";
 import { storeErrorDetail } from "./boomboxErrorStore.js";
 import { updateBoomBoxLogDashboard } from "./boomboxLogDashboard.js";
+import { enqueueBoomBoxJob } from "./boomboxQueue.js";
 import { logError } from "../utils/errorLogger.js";
 import { logger }   from "../utils/logger.js";
 
@@ -199,6 +201,57 @@ function buildErrorDetailButton(detailId) {
   );
 }
 
+// ── Queue notice delivery ───────────────────────────────────────────────────
+// Discord only supports true ephemeral replies on interactions — this flow
+// starts from a plain text message, so there is no interaction to reply
+// ephemerally to. DM the requester instead (only they see it, closest
+// available equivalent to "ephemeral" here); if their DMs are closed, fall
+// back to a single message in the channel that is edited in place (never
+// spammed) and removed the moment their job starts.
+
+/** @typedef {{ dm: import("discord.js").Message|null, channelMsg: import("discord.js").Message|null }} QueueNoticeState */
+
+/** @returns {QueueNoticeState} */
+function newQueueNoticeState() {
+  return { dm: null, channelMsg: null };
+}
+
+async function renderQueueNotice(state, message, position, total, etaSec) {
+  const embed = buildQueueEmbed(message.author, position, total, etaSec);
+
+  if (state.dm) {
+    try {
+      await state.dm.edit({ embeds: [embed] });
+      return;
+    } catch {
+      state.dm = null; // DM message gone — fall through and try again below
+    }
+  } else {
+    try {
+      state.dm = await message.author.send({ embeds: [embed] });
+      return;
+    } catch {
+      logger.debug(`[BoomBox Queue] Could not DM ${message.author.id} — falling back to a channel notice`);
+    }
+  }
+
+  // DM unavailable — use ONE channel message, edited in place per update.
+  try {
+    if (state.channelMsg) {
+      await state.channelMsg.edit({ content: `${message.author}`, embeds: [embed] });
+    } else {
+      state.channelMsg = await message.channel.send({ content: `${message.author}`, embeds: [embed] });
+    }
+  } catch (e) {
+    logger.warn(`[BoomBox Queue] Failed to render queue notice: ${e.message}`);
+  }
+}
+
+async function clearQueueNotice(state) {
+  if (state.dm) await state.dm.delete().catch(() => {});
+  if (state.channelMsg) await state.channelMsg.delete().catch(() => {});
+}
+
 // ── BoomBox Logs System ───────────────────────────────────────────────────────
 // Archive of generated BoomBox URLs only — no requester info. A single
 // dashboard message is edited in place and paginated (mirrors Ticket Logs);
@@ -351,7 +404,32 @@ export async function handleBoomBoxMessage(message) {
     }
   }
 
-  // ── [2] Send ONE temporary status embed immediately ───────────────────────
+  // ── [2] Enter the BoomBox queue ────────────────────────────────────────────
+  // At most a few jobs run at once (see boomboxQueue.js); everything beyond
+  // that waits its turn FIFO. While waiting, the requester gets a private
+  // (DM-first) queue notice instead of anything posted visibly in the
+  // channel — see renderQueueNotice(). The visible "Processing BoomBox..."
+  // embed itself is only created once this job actually starts (onStart),
+  // so the channel never shows a frozen/queued job sitting there.
+  const queueNotice = newQueueNoticeState();
+
+  await enqueueBoomBoxJob(
+    () => runBoomBoxJob(message, url, platform, userMention, unlimited, limit),
+    {
+      onQueued: (position, total, etaSec) => renderQueueNotice(queueNotice, message, position, total, etaSec),
+      onStart:  () => clearQueueNotice(queueNotice),
+    },
+  );
+}
+
+/**
+ * The actual BoomBox pipeline for one request — runs only once a queue
+ * slot is free. Fully self-contained: catches its own errors (never
+ * rethrows) and cleans up its own temp files, so the queue itself never
+ * needs to know about failures.
+ */
+async function runBoomBoxJob(message, url, platform, userMention, unlimited, limit) {
+  // ── Send ONE temporary status embed immediately ───────────────────────────
   // Everything after this point edits this same message — never sends a new
   // one — so the channel never gets spammed with progress messages.
   let currentStage = "Send Processing Embed";
@@ -469,13 +547,19 @@ export async function handleBoomBoxMessage(message) {
     db.addHistory(entry);
     db.incrementStats(platform);
 
-    // ── [7] Edit → result embed + buttons ─────────────────────────────────
+    // ── [7] Success — delete the processing embed, send a BRAND NEW message ──
+    // Editing the processing message into the result was the old behavior;
+    // per spec this now deletes it and sends a fresh message that @mentions
+    // the requester, so they get a real notification even if they've
+    // switched to another channel (an edit to an old message does not
+    // re-notify Discord clients the way a new mention does).
     currentStage = "Display Result";
     const elapsedMs = Date.now() - startedAt;
     const embed     = buildResultEmbed(platform, ytResult, boomboxUrl, elapsedMs, usageInfo);
     const row       = buildButtons(boomboxUrl);
-    await statusMsg.edit({
-      content: `${userMention} ✅ **BoomBox berhasil dibuat.**`,
+    await statusMsg.delete().catch(() => {});
+    await message.channel.send({
+      content: `${userMention} ✅ **BoomBox Ready** — your BoomBox URL has been created successfully.`,
       embeds: [embed],
       components: [row],
     });

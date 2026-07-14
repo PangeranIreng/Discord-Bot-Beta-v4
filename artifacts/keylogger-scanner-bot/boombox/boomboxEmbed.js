@@ -14,6 +14,7 @@ const COLOR_PROCESSING = 0x5865f2; // Blurple
 const COLOR_SUCCESS    = 0x57f287; // Green
 const COLOR_DURATION   = 0xfaa61a; // Orange — limit notice, not an error
 const COLOR_ERROR      = 0xed4245; // Red
+const COLOR_QUEUE      = 0xfee75c; // Yellow — waiting, not an error
 const FOOTER_TEXT      = "Powered by Pangeran Assistant AI";
 const SEP14            = "━━━━━━━━━━━━━━";
 
@@ -50,12 +51,12 @@ export function truncateTitle(title, maxLen = 40) {
 // ── Processing Embed (progress bar, edited at each step) ─────────────────────
 
 const STEPS = [
-  { bar: "██░░░░░░░░", label: "Please wait..."            },
-  { bar: "████░░░░░░", label: "Fetching video..."          },
-  { bar: "██████░░░░", label: "Extracting audio..."        },
-  { bar: "████████░░", label: "Uploading to Top4Top..."    },
-  { bar: "██████████", label: "Generating BoomBox URL..."  },
-  { bar: "██████████", label: "Finished."                  },
+  { bar: "██░░░░░░░░", label: "Please wait..."             },
+  { bar: "████░░░░░░", label: "🔍 Analyzing Link..."        },
+  { bar: "██████░░░░", label: "⬇ Downloading Audio..."      },
+  { bar: "████████░░", label: "🎵 Creating BoomBox URL..."  },
+  { bar: "██████████", label: "📤 Finalizing..."            },
+  { bar: "██████████", label: "Finished."                   },
 ];
 
 /**
@@ -79,6 +80,37 @@ export function buildProcessingEmbed(stepIndex = 0, thumbnail = null, labelOverr
     .setFooter({ text: FOOTER_TEXT });
   if (thumbnail) embed.setThumbnail(thumbnail);
   return embed;
+}
+
+// ── Queue Notice Embed ──────────────────────────────────────────────────────
+//
+// Shown while a request is waiting for a free BoomBox worker slot. Discord
+// only supports true ephemeral replies on interactions (slash commands,
+// buttons, modals) — this flow is triggered by a plain text message, which
+// has no interaction to reply ephemerally to. The closest equivalent is a
+// DM to the requester (only they see it); see boomboxHandler.js for the
+// DM-first, single-edited-channel-message-fallback delivery logic.
+
+/**
+ * @param {import("discord.js").User} user
+ * @param {number} position   1-based position in the FIFO queue
+ * @param {number} total      Total jobs currently queued
+ * @param {number} etaSec     Estimated wait before this job starts
+ */
+export function buildQueueEmbed(user, position, total, etaSec) {
+  return new EmbedBuilder()
+    .setColor(COLOR_QUEUE)
+    .setTitle("⏳ BoomBox Queue")
+    .setDescription(
+      `Hi <@${user.id}>\n\n` +
+      "Your link has been received.\n\n" +
+      "Please wait. Your BoomBox URL will be generated automatically.",
+    )
+    .addFields(
+      { name: "Queue Position", value: `#${position}${total > position ? ` of ${total}` : ""}`, inline: true },
+      { name: "Estimated Wait", value: `${etaSec} Seconds`, inline: true },
+    )
+    .setFooter({ text: FOOTER_TEXT });
 }
 
 // ── Result Embed ──────────────────────────────────────────────────────────────
