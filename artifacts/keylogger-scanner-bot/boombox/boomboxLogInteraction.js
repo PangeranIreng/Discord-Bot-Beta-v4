@@ -67,9 +67,26 @@ export async function handleBoomBoxLogInteraction(interaction) {
         interaction.message?.ephemeral ?? false;
 
       if (isEphemeral) {
-        // Jump request from View All Pages ephemeral — just acknowledge
+        // Jump request from View All Pages ephemeral — update the main dashboard
+        // message directly, then acknowledge the ephemeral interaction.
+        const state = db.getLogState();
+        if (state.messageId && interaction.channel) {
+          try {
+            const dashMsg = await interaction.channel.messages
+              .fetch(state.messageId)
+              .catch(() => null);
+            if (dashMsg) {
+              await dashMsg.edit({
+                embeds:     [buildLogDashboardEmbed(entries, page)],
+                components: buildLogDashboardComponents(entries, page),
+              });
+            }
+          } catch (editErr) {
+            logger.warn(`[BoomBox] Failed to update dashboard from ephemeral page select: ${editErr.message}`);
+          }
+        }
         await interaction.reply({
-          content: `Navigasi ke **Halaman ${page}** — buka dashboard untuk melihat perubahannya.`,
+          content:   `✅ Dashboard berpindah ke **Halaman ${page}**.`,
           ephemeral: true,
         }).catch(() => {});
       } else {

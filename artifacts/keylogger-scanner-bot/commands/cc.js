@@ -2,7 +2,8 @@
  * commands/cc.js — /cc <jumlah>
  *
  * Hapus N pesan terakhir dari channel saat ini.
- * Owner/Developer only.
+ * Owner/Developer only. Menerima jumlah berapa pun — iterasi batch 100
+ * sesuai batas Discord API hingga jumlah tercapai atau chat habis.
  */
 
 import { SlashCommandBuilder } from "discord.js";
@@ -11,13 +12,12 @@ import { logger } from "../utils/logger.js";
 
 export const data = new SlashCommandBuilder()
   .setName("cc")
-  .setDescription("Hapus pesan terakhir di channel ini (Owner/Developer only)")
+  .setDescription("Hapus pesan di channel ini (Owner/Developer only)")
   .addIntegerOption((opt) =>
     opt
       .setName("jumlah")
-      .setDescription("Jumlah pesan yang akan dihapus (1–100)")
+      .setDescription("Jumlah pesan yang akan dihapus")
       .setMinValue(1)
-      .setMaxValue(100)
       .setRequired(true),
   );
 
@@ -35,35 +35,61 @@ export async function execute(interaction) {
       return;
     }
 
-    // Discord bulk-delete API only works for messages younger than 14 days.
-    // Fetch up to `jumlah` messages and split them into bulk-delete-eligible
-    // vs older (must be deleted one-by-one, slower).
-    const fetched = await channel.messages.fetch({ limit: jumlah });
-    if (fetched.size === 0) {
-      await interaction.editReply({ content: "ℹ️ Tidak ada pesan yang ditemukan." });
-      return;
-    }
-
     const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000; // 14 days ago
-    const bulk   = fetched.filter((m) => m.createdTimestamp > cutoff);
-    const old    = fetched.filter((m) => m.createdTimestamp <= cutoff);
+    let deleted  = 0;
+    let remaining = jumlah;
+    let lastId   = undefined;
+    let lastProgressUpdate = Date.now();
 
-    let deleted = 0;
+    while (remaining > 0) {
+      // Discord API: max 100 messages per fetch
+      const fetchLimit = Math.min(remaining, 100);
+      const fetchOpts  = { limit: fetchLimit };
+      if (lastId) fetchOpts.before = lastId;
 
-    if (bulk.size >= 2) {
-      await channel.bulkDelete(bulk, true);
-      deleted += bulk.size;
-    } else if (bulk.size === 1) {
-      await bulk.first().delete().catch(() => {});
-      deleted += 1;
-    }
+      const fetched = await channel.messages.fetch(fetchOpts);
+      if (fetched.size === 0) break;
 
-    // Delete older messages one by one (rate-limited path)
-    for (const msg of old.values()) {
-      await msg.delete().catch(() => {});
-      deleted++;
-      // Small delay to respect rate limits
-      await new Promise((r) => setTimeout(r, 400));
+      // Track the oldest message ID for next-page pagination
+      lastId = fetched.last()?.id;
+
+      const bulk = fetched.filter((m) => m.createdTimestamp > cutoff);
+      const old  = fetched.filter((m) => m.createdTimestamp <= cutoff);
+
+      // Bulk delete recent messages (up to 100, Discord limit)
+      if (bulk.size >= 2) {
+        await channel.bulkDelete(bulk, true);
+        deleted += bulk.size;
+      } else if (bulk.size === 1) {
+        await bulk.first().delete().catch(() => {});
+        deleted += 1;
+      }
+
+      // Delete older messages one by one (rate-limited path)
+      for (const msg of old.values()) {
+        await msg.delete().catch(() => {});
+        deleted++;
+        await new Promise((r) => setTimeout(r, 400));
+      }
+
+      remaining -= fetched.size;
+
+      // Update progress every ~5 seconds so the interaction doesn't timeout
+      // for very large deletions, and so the user knows we're still working.
+      if (remaining > 0 && Date.now() - lastProgressUpdate > 5000) {
+        await interaction.editReply({
+          content: `⏳ Menghapus pesan... **${deleted}** sudah dihapus, **${remaining}** tersisa.`,
+        }).catch(() => {});
+        lastProgressUpdate = Date.now();
+      }
+
+      // Short pause between batches to respect Discord rate limits on bulkDelete
+      if (remaining > 0 && fetched.size === fetchLimit) {
+        await new Promise((r) => setTimeout(r, 1200));
+      }
+
+      // No more messages available
+      if (fetched.size < fetchLimit) break;
     }
 
     await interaction.editReply({

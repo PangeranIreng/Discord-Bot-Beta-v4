@@ -10,7 +10,7 @@ import FormData from "form-data";
 import { logger } from "../utils/logger.js";
 
 const MAX_RETRIES   = 3;
-const RETRY_DELAY   = 3000; // ms between retries
+const RETRY_DELAY   = 1500; // ms between retries
 
 // Reused across every upload attempt/retry so we don't pay a fresh TCP+TLS
 // handshake each time.

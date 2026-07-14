@@ -154,12 +154,12 @@ function effectiveDailyLimit(member) {
 // ── Cleanup ───────────────────────────────────────────────────────────────────
 
 /** Small delay so status transitions read as a smooth process instead of an
- * instant flicker, per spec (300–700ms between edits). */
+ * instant flicker. Kept short to minimise total processing time. */
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 function smoothDelay() {
-  return sleep(300 + Math.floor(Math.random() * 400)); // 300–700ms
+  return sleep(100 + Math.floor(Math.random() * 100)); // 100–200ms
 }
 
 function tryCleanup(tmpDir) {

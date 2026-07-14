@@ -21,6 +21,7 @@ import os                from "node:os";
 import https             from "node:https";
 import { fileURLToPath } from "node:url";
 import ytdlCore           from "@distube/ytdl-core";
+import { kaizenDownload } from "./kaizenDownloader.js";
 import { logger }        from "../utils/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -544,10 +545,27 @@ async function _ytdlYouTube(input, type, quality, onProgress) {
     for (const f of fs.readdirSync(tmpDir)) fs.unlinkSync(path.join(tmpDir, f));
   } catch {}
 
+  // ── API 2: @distube/ytdl-core ─────────────────────────────────────────────
   try {
     return await _ytdlCoreFallback(input, type, quality, tmpDir, onProgress);
   } catch (err) {
-    logger.warn(`[ytmp3gg] Fallback engine also failed: ${err.message}`);
+    logger.warn(`[ytmp3gg] API 2 (ytdl-core) also failed: ${err.message}`);
+    // ytdl-core failed too — fall through to API 3 (kaizenapi)
+  }
+
+  // ── API 3 (last resort): kaizenapi.my.id ─────────────────────────────────
+  // Only used when BOTH yt-dlp and ytdl-core have been exhausted.
+  // Never used as primary or secondary — only as final backup.
+  try {
+    for (const f of fs.readdirSync(tmpDir)) fs.unlinkSync(path.join(tmpDir, f));
+  } catch {}
+
+  try {
+    await onProgress?.("Trying alternative API...");
+    logger.info(`[ytmp3gg] YouTube — trying API 3 (kaizenapi.my.id)`);
+    return await kaizenDownload(input, type, quality, tmpDir);
+  } catch (kaizenErr) {
+    logger.warn(`[ytmp3gg] API 3 (kaizenapi) also failed: ${kaizenErr.message}`);
     try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
     throw lastError;
   }
