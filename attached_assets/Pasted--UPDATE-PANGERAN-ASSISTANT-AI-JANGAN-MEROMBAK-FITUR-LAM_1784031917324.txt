@@ -1,0 +1,363 @@
+# UPDATE PANGERAN ASSISTANT AI (JANGAN MEROMBAK FITUR LAMA)
+
+PENTING!
+
+Jangan menghapus atau merombak fitur yang sudah berjalan.
+Jangan mengubah command lama.
+Jangan mengubah database lama.
+Jangan mengubah UI lama.
+Jangan mengubah sistem Ticket, BoomBox, Premium, Scanner, AI, maupun Panel Role yang sudah ada.
+
+Lakukan penambahan fitur berikut dengan coding yang bersih, modular, aman, dan tidak menyebabkan konflik dengan sistem lama.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. PERMISSION ADMIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Seluruh command admin WAJIB hanya dapat digunakan oleh Owner dan Developer sesuai sistem permission yang sudah ada.
+
+Jika user tidak memiliki izin tampilkan:
+
+❌ Kamu tidak memiliki izin untuk menggunakan command ini.
+
+Terapkan pada seluruh command admin seperti:
+
+/cpanel
+/paneledit
+/cc
+/setclaimticket
+/addprem
+/removeprem
+/setlimit
+/thread
+dan command admin lainnya.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. COMMAND BARU /cc
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tambahkan command
+
+/cc <jumlah>
+
+Contoh
+
+/cc 99
+
+Fungsi:
+
+Menghapus chat sesuai jumlah yang dimasukkan.
+
+Contoh:
+
+/cc 99
+
+= menghapus 99 pesan terakhir pada channel tersebut.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. CLAIM TICKET BARU
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN mengubah
+
+/cticket
+/setlogticket
+
+Tetap gunakan sistem lama.
+
+Tambahkan command baru
+
+/setclaimticket
+
+Parameter
+
+channel
+role
+
+Contoh
+
+/setclaimticket
+channel:#staff-control
+role:@Owner
+
+Fungsi:
+
+Mengatur channel Staff Control.
+
+Saat user membuka Ticket.
+
+Bot mengirim panel Staff ke channel tersebut.
+
+Isi notifikasi:
+
+🚨 Ada yang buka tiket nih cuy, segera respon!
+
+@Role
+
+User :
+@Member
+
+Ticket :
+#ticket-001
+
+Di bawah embed tampil tombol
+
+✅ Claim Ticket
+
+🔒 Close Ticket
+
+📄 Transcript
+
+🗑 Delete
+
+Panel ini HANYA dikirim ke channel Staff Control.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. TICKET USER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat user membuka Ticket.
+
+JANGAN tampilkan tombol
+
+Claim
+
+Close
+
+Delete
+
+Transcript
+
+User hanya melihat embed Ticket dan dapat mengirim chat.
+
+Seluruh tombol Staff hanya muncul pada channel Claim Ticket.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. HELP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN merombak Help.
+
+Tetap gunakan Help lama.
+
+Cukup tambahkan
+
+Kategori Ticket
+
+/setclaimticket
+
+Tambahkan kategori baru
+
+🧵 Thread
+
+/thread #channel on
+
+/thread #channel off
+
+/thread list
+
+Jangan mengubah kategori lain.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. AUTO THREAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tambahkan command
+
+/thread #channel on
+
+/thread #channel off
+
+/thread list
+
+Jika ON
+
+Semua posting baru pada channel tersebut otomatis dibuat Thread.
+
+Nama Thread selalu
+
+💬 Chat Disini
+
+Jangan mention user.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. THREAD LIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Contoh
+
+🧵 Auto Thread
+
+🟢 #gallery
+
+🟢 #media
+
+🔴 #showcase
+
+━━━━━━━━━━
+
+Total Channel : 3
+
+Hijau = ON
+
+Merah = OFF
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. BOOMBOX LOGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN spam pesan baru.
+
+Gunakan SATU pesan yang terus diedit.
+
+Satu halaman maksimal
+
+10 BoomBox.
+
+Jika sudah penuh.
+
+Otomatis buat Halaman berikutnya.
+
+JANGAN menghapus halaman lama.
+
+Semua halaman wajib tetap tersimpan.
+
+Isi BoomBox Logs hanya:
+
+🎵 Judul
+
+🔗 BoomBox URL
+
+JANGAN tampilkan
+
+User
+
+Mention User
+
+YouTube URL
+
+TikTok URL
+
+Status Error
+
+Semua Error tetap masuk Error Logs.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. CONTOH BOOMBOX LOGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📻 BoomBox Logs
+
+1.
+
+🎵 Alan Walker - Faded
+
+🔗 https://.....
+
+2.
+
+🎵 DJ Opus
+
+🔗 https://.....
+
+...
+
+10.
+
+🎵 Unknown Brain
+
+🔗 https://.....
+
+━━━━━━━━━━
+
+📄 Halaman 1/3
+
+◀ Previous
+
+📚 Semua Halaman
+
+Next ▶
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. SEMUA HALAMAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Saat tombol
+
+📚 Semua Halaman
+
+ditekan.
+
+JANGAN langsung berpindah halaman.
+
+Tampilkan daftar halaman.
+
+Contoh
+
+📚 BoomBox Logs
+
+Pilih Halaman
+
+📄 Halaman 1 (10 Log)
+
+📄 Halaman 2 (10 Log)
+
+📄 Halaman 3 (7 Log)
+
+━━━━━━━━━━
+
+Total Logs : 27
+
+User dapat memilih halaman yang ingin dibuka secara langsung.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. EDIT MESSAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BoomBox Logs menggunakan sistem Edit Message.
+
+Bukan mengirim embed baru setiap BoomBox berhasil.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. DATABASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Seluruh konfigurasi baru WAJIB tersimpan pada database.
+
+Meliputi:
+
+Claim Ticket Channel
+
+Claim Ticket Role
+
+Auto Thread
+
+BoomBox Logs Page
+
+Halaman BoomBox terakhir
+
+Status ON/OFF Thread
+
+Saat bot restart.
+
+Semua konfigurasi wajib tetap tersimpan.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. PENTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+JANGAN menghapus fitur lama.
+
+JANGAN mengubah command lama.
+
+JANGAN mengubah database lama.
+
+JANGAN mengubah UI lama.
+
+JANGAN mengubah Ticket lama.
+
+JANGAN mengubah BoomBox lama.
+
+JANGAN mengubah Help lama selain menambahkan command yang disebutkan.
+
+Pastikan seluruh fitur baru kompatibel dengan sistem yang sudah ada, bebas bug, modular, stabil, dan tidak menyebabkan error pada fitur lain.

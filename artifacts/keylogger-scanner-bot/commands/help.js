@@ -48,6 +48,11 @@ const CATEGORIES = {
     label: "CPanel",
     description: "Buat & kelola panel interaktif",
   },
+  thread: {
+    emoji: "🧵",
+    label: "Thread",
+    description: "Auto Thread per channel",
+  },
   admin: {
     emoji: "⚙️",
     label: "Admin",
@@ -78,6 +83,24 @@ const USAGE = {
     emoji: "🗑️",
     summary: "Hapus panel, dashboard, dan konfigurasi Ticket System. Owner only.",
     examples: ["`/delcticket`"],
+  },
+  setclaimticket: {
+    category: "ticket",
+    emoji: "🎫",
+    summary: "Atur channel Staff Control — notifikasi & tombol Claim/Close/Transcript/Delete dikirim ke sini.",
+    examples: ["`/setclaimticket channel:#staff-control role:@Owner`"],
+  },
+
+  // 🧵 Thread
+  thread: {
+    category: "thread",
+    emoji: "🧵",
+    summary: "Aktifkan/nonaktifkan Auto Thread di channel tertentu, atau lihat daftarnya.",
+    examples: [
+      "`/thread on channel:#gallery` → Aktifkan",
+      "`/thread off channel:#gallery` → Nonaktifkan",
+      "`/thread list` → Lihat semua channel",
+    ],
   },
 
   // 🐞 Report (under admin)

@@ -6,7 +6,7 @@
     "dashboardMessageId": "1526320881339469939",
     "mentionRoleId": "1462696203241132118"
   },
-  "counter": 2,
+  "counter": 4,
   "tickets": [
     {
       "number": 1,
@@ -23,12 +23,38 @@
       "number": 2,
       "threadId": "1526500665424351292",
       "userId": "1526499408282390619",
-      "handlerId": null,
-      "status": "open",
+      "handlerId": "1462685321262272664",
+      "status": "closed",
       "createdAt": "2026-07-14T08:08:40.294Z",
-      "closedAt": null,
+      "closedAt": "2026-07-14T11:21:25.982Z",
       "durationMs": null,
       "firstReplySent": false
+    },
+    {
+      "number": 3,
+      "threadId": "1526549755671347231",
+      "userId": "1526499408282390619",
+      "handlerId": "1462685321262272664",
+      "status": "closed",
+      "createdAt": "2026-07-14T11:23:44.760Z",
+      "closedAt": "2026-07-14T12:28:44.325Z",
+      "durationMs": 3899565,
+      "firstReplySent": true,
+      "statusMessageId": "1526549763905032213",
+      "controlMessageId": "1526549765624434719"
+    },
+    {
+      "number": 4,
+      "threadId": "1526556129747009617",
+      "userId": "1462685321262272664",
+      "handlerId": "1462685321262272664",
+      "status": "closed",
+      "createdAt": "2026-07-14T11:49:05.407Z",
+      "closedAt": "2026-07-14T12:28:41.386Z",
+      "durationMs": 2375979,
+      "firstReplySent": false,
+      "statusMessageId": "1526556141134548996",
+      "controlMessageId": "1526556143046885459"
     }
   ]
 }

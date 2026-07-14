@@ -19,6 +19,9 @@ const DEFAULT_DB = {
     logsChannelId:      null,
     dashboardMessageId: null, // the single always-edited Ticket Logs dashboard message
     mentionRoleId:      null,
+    // /setclaimticket — dedicated Staff Control channel for Claim/Close/Transcript/Delete buttons
+    claimChannelId:     null,
+    claimRoleId:        null,
   },
   // Running ticket number counter (never reused, even after closes).
   counter: 0,

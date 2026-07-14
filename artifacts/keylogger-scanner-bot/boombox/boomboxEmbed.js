@@ -244,21 +244,16 @@ export function formatWIB(isoTimestamp) {
 }
 
 /**
- * One entry's block within the log embed description. Intentionally carries
- * NO user information (no username/mention/ID/avatar/nickname) and no
- * duration/platform/processing-time — only Title, BoomBox URL, and Created
- * time, exactly per the BoomBox Logs redesign spec.
+ * One entry's text block for the log embed. Carries NO user info, no
+ * timestamp, no status — only Title and BoomBox URL per the current spec.
+ * Numbering is handled by the caller (buildPageDescription in
+ * boomboxLogDashboard.js).
  *
- * @param {{title: string, boomboxUrl: string, timestamp: string}} entry
+ * @param {{title: string, boomboxUrl: string}} entry
  */
 export function buildLogEntryBlock(entry) {
-  return [
-    `🎵 ${truncateTitle(entry.title, 60)}`,
-    "",
-    `🔗 ${entry.boomboxUrl}`,
-    "",
-    `🕒 ${formatWIB(entry.timestamp)}`,
-  ].join("\n");
+  const title = truncateTitle(entry.title, 60);
+  return `🎵 ${title}\n🔗 ${entry.boomboxUrl ?? "-"}`;
 }
 
 // NOTE: the paginated BoomBox Logs dashboard embed itself now lives in

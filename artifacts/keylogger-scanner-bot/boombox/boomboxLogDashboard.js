@@ -1,9 +1,9 @@
 /**
  * boomboxLogDashboard.js — Paginated BoomBox Logs dashboard.
  *
- * Single message edited in place. Navigation: First / Previous / Refresh /
- * Next / Last + "View All Pages" button that lists all pages as a select menu.
- * Entries carry no requester info by design (see boomboxEmbed.js).
+ * Single message, edited in place. 10 entries per page.
+ * Navigation: ◀ Previous | 📚 Semua Halaman | Next ▶
+ * Each entry shows only: numbered index, 🎵 Title, 🔗 URL.
  */
 
 import {
@@ -14,56 +14,72 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 
-import { BOOMBOX_CONFIG }       from "./boomboxConfig.js";
-import { db }                   from "./db.js";
-import { buildLogEntryBlock, LOG_SEP } from "./boomboxEmbed.js";
-import { logger }               from "../utils/logger.js";
+import { BOOMBOX_CONFIG }  from "./boomboxConfig.js";
+import { db }              from "./db.js";
+import { LOG_SEP }         from "./boomboxEmbed.js";
+import { logger }          from "../utils/logger.js";
 
 const COLOR_LOG        = 0x3ba4ff;
-const PAGE_SIZE         = 20;
-/** Discord hard-caps embed description at 4096 chars; stay comfortably under it. */
-const DESC_SAFE_LIMIT   = 3900;
+const PAGE_SIZE        = 10;
+const DESC_SAFE_LIMIT  = 3900;
 
 export function resolvePage(entries, requestedPage) {
   const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
   const page       = Math.min(Math.max(1, requestedPage || 1), totalPages);
-  const slice       = entries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const slice      = entries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   return { totalPages, page, slice };
 }
 
-/** Build the description for one page, trimming further if a pathological
- * entry (e.g. very long URL) would still blow past Discord's limit. */
-function buildPageDescription(slice) {
-  if (slice.length === 0) return LOG_SEP + "\n\n_Belum ada data BoomBox._\n\n" + LOG_SEP;
-  let blocks = slice.map(buildLogEntryBlock);
-  let desc   = `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
-  while (desc.length > DESC_SAFE_LIMIT && blocks.length > 1) {
-    blocks = blocks.slice(0, -1);
-    desc   = `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
+/**
+ * Build numbered description for one page.
+ * Format per entry:
+ *   {n}.
+ *   🎵 Title
+ *   🔗 URL
+ */
+function buildPageDescription(slice, pageStartIndex) {
+  if (slice.length === 0) {
+    return `${LOG_SEP}\n\n_Belum ada data BoomBox._\n\n${LOG_SEP}`;
   }
+
+  const blocks = [];
+  for (let i = 0; i < slice.length; i++) {
+    const entry = slice[i];
+    const n     = pageStartIndex + i;
+    // Truncate title at 60 chars to keep description manageable
+    const title = (entry.title ?? "Unknown").slice(0, 60);
+    blocks.push(`**${n}.**\n🎵 ${title}\n🔗 ${entry.boomboxUrl ?? "-"}`);
+  }
+
+  let desc = `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
+
+  // Safety trim: if pathological entry blows past Discord's limit
+  while (desc.length > DESC_SAFE_LIMIT && blocks.length > 1) {
+    blocks.pop();
+    desc = `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
+  }
+
   return desc;
 }
 
 export function buildLogDashboardEmbed(entries, requestedPage = 1) {
   const { totalPages, page, slice } = resolvePage(entries, requestedPage);
+  const pageStartIndex = (page - 1) * PAGE_SIZE + 1;
+
   return new EmbedBuilder()
     .setColor(COLOR_LOG)
-    .setTitle("🎵 BoomBox Logs")
-    .setDescription(buildPageDescription(slice))
-    .setFooter({ text: `Pangeran Assistant AI • BoomBox Logs • Halaman ${page} / ${totalPages} • Total: ${entries.length} entri` })
+    .setTitle("📻 BoomBox Logs")
+    .setDescription(buildPageDescription(slice, pageStartIndex))
+    .setFooter({
+      text: `━━━━━━━━━━\n📄 Halaman ${page}/${totalPages}\nPangeran Assistant AI • BoomBox Logs • Total: ${entries.length} entri`,
+    })
     .setTimestamp();
 }
 
-// ── Navigation buttons ──────────────────────────────────────────────────────
+// ── Navigation: ◀ Previous | 📚 Semua Halaman | Next ▶ ──────────────────────
 
 function buildNavRow(page, totalPages) {
   return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`bblog:nav:first:${page}`)
-      .setEmoji("⏮️")
-      .setLabel("First")
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page <= 1),
     new ButtonBuilder()
       .setCustomId(`bblog:nav:prev:${page}`)
       .setEmoji("◀️")
@@ -71,74 +87,52 @@ function buildNavRow(page, totalPages) {
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page <= 1),
     new ButtonBuilder()
-      .setCustomId(`bblog:nav:refresh:${page}`)
-      .setEmoji("🔄")
-      .setLabel("Refresh")
-      .setStyle(ButtonStyle.Secondary),
+      .setCustomId(`bblog:viewall:${page}`)
+      .setEmoji("📚")
+      .setLabel("Semua Halaman")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(totalPages <= 1),
     new ButtonBuilder()
       .setCustomId(`bblog:nav:next:${page}`)
       .setEmoji("▶️")
       .setLabel("Next")
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(page >= totalPages),
-    new ButtonBuilder()
-      .setCustomId(`bblog:nav:last:${page}`)
-      .setEmoji("⏭️")
-      .setLabel("Last")
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages),
-  );
-}
-
-/** "View All Pages" — shown as a button that opens a page-list select menu. */
-function buildViewAllRow(page, totalPages) {
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`bblog:viewall:${page}`)
-      .setEmoji("📁")
-      .setLabel("View All Pages")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(totalPages <= 1),
-  );
-}
-
-function buildPageSelectRow(totalPages) {
-  const options = Array.from({ length: Math.min(totalPages, 25) }, (_, i) => ({
-    label: `Halaman ${i + 1}`,
-    description: `${Math.min((i + 1) * PAGE_SIZE, /* approximation */ totalPages * PAGE_SIZE)} entri`,
-    value: `${i + 1}`,
-  }));
-  return new ActionRowBuilder().addComponents(
-    new StringSelectMenuBuilder()
-      .setCustomId("bblog:pagesel")
-      .setPlaceholder("📂 Pilih Halaman")
-      .addOptions(options),
   );
 }
 
 export function buildLogDashboardComponents(entries, requestedPage = 1) {
   const { totalPages, page } = resolvePage(entries, requestedPage);
-  const rows = [buildNavRow(page, totalPages), buildViewAllRow(page, totalPages)];
-  return rows;
+  return [buildNavRow(page, totalPages)];
 }
 
-/**
- * The "View All Pages" ephemeral — shows all pages as a select so the user
- * can jump directly. Called from boomboxLogInteraction.js.
- */
+// ── "Semua Halaman" ephemeral — shows page list so user can jump directly ─────
+
 export function buildViewAllEmbed(entries) {
   const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
+
   const lines = Array.from({ length: totalPages }, (_, i) => {
-    const start = i * PAGE_SIZE + 1;
-    const end   = Math.min((i + 1) * PAGE_SIZE, entries.length);
-    return `📂 **Halaman ${i + 1}** — ${start}–${end} (${end - start + 1} entri)`;
+    const count = i < totalPages - 1
+      ? PAGE_SIZE
+      : entries.length - i * PAGE_SIZE;
+    return `📄 Halaman ${i + 1} (${count} Log)`;
   });
 
   return new EmbedBuilder()
     .setColor(0x3ba4ff)
-    .setTitle("📁 BoomBox Logs — Semua Halaman")
-    .setDescription(lines.join("\n") || "Belum ada data.")
-    .setFooter({ text: "Pilih halaman dari menu di bawah." });
+    .setTitle("📚 BoomBox Logs")
+    .setDescription(
+      [
+        "Pilih Halaman",
+        "",
+        ...lines,
+        "",
+        "━━━━━━━━━━",
+        "",
+        `Total Logs : ${entries.length}`,
+      ].join("\n"),
+    )
+    .setFooter({ text: "Pangeran Assistant AI • BoomBox Logs" });
 }
 
 export function buildViewAllSelectRow(totalPages) {
@@ -156,10 +150,8 @@ export function buildViewAllSelectRow(totalPages) {
   ];
 }
 
-/**
- * Recalculate and update (or create) the single BoomBox Logs dashboard
- * message. Always resets to page 1 on auto-refresh (new entry arriving).
- */
+// ── Auto-update dashboard (called after each successful BoomBox) ───────────────
+
 export async function updateBoomBoxLogDashboard(client, { resetToFirstPage = true } = {}) {
   try {
     const ch = await client.channels.fetch(BOOMBOX_CONFIG.BOOMBOX_LOG_CHANNEL_ID).catch(() => null);

@@ -22,6 +22,7 @@ import { ticketDB } from "./ticket/ticketDB.js";
 import { handleBugReportInteraction } from "./bugreport/bugReportInteraction.js";
 import { handleCpanelInteraction } from "./cpanel/cpanelInteraction.js";
 import { handleHelpInteraction } from "./commands/help.js";
+import { threadDB } from "./thread/threadDB.js";
 
 const SECRETS_POLL_MS = 3000;
 
@@ -154,6 +155,14 @@ function startBot(secrets) {
       if (processedMessageIds.size > MAX_DEDUP_SIZE) {
         // Drop the oldest entry (Map/Set preserve insertion order).
         processedMessageIds.delete(processedMessageIds.values().next().value);
+      }
+
+      // Auto Thread: silently create "💬 Chat Disini" thread on any new post
+      // in a channel where auto-thread is ON. Fire-and-forget — never blocks
+      // message processing or the BoomBox/scanner pipelines below.
+      if (!message.channel?.isThread() && threadDB.isEnabled(message.channelId)) {
+        message.startThread({ name: "💬 Chat Disini", autoArchiveDuration: 60 })
+          .catch(() => {});
       }
 
       // ── Ticket threads: own isolated domain, handled and returned early ──

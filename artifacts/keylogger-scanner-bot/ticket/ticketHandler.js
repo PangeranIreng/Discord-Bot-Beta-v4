@@ -125,11 +125,30 @@ export async function openTicket(interaction) {
   const statusMsg = await thread.send({ embeds: [buildTicketStatusEmbed(number, "open", null)] });
   ticketDB.updateTicket(thread.id, { statusMessageId: statusMsg.id });
 
-  // Claim/Close/Transcript/Delete controls live only in the staff-only Ticket Logs channel.
-  const logsChannel = await interaction.client.channels.fetch(config.logsChannelId).catch(() => null);
-  if (logsChannel?.isTextBased()) {
+  // Staff control panel: Claim / Close / Transcript / Delete buttons.
+  // Send to claimChannelId (/setclaimticket) if configured; otherwise fall
+  // back to logsChannelId so the feature works even before /setclaimticket
+  // has been used.
+  const staffChannelId = config.claimChannelId || config.logsChannelId;
+  const staffChannel   = staffChannelId
+    ? await interaction.client.channels.fetch(staffChannelId).catch(() => null)
+    : null;
+
+  if (staffChannel?.isTextBased()) {
     try {
-      const controlMsg = await logsChannel.send({
+      // Notification content: @Role mention + user + ticket info
+      const rolePing = config.claimRoleId ? `<@&${config.claimRoleId}>` : "";
+      const notifContent = [
+        "🚨 Ada yang buka tiket nih cuy, segera respon!",
+        "",
+        rolePing,
+        "",
+        `User : <@${interaction.user.id}>`,
+        `Ticket : ${thread}`,
+      ].filter(Boolean).join("\n");
+
+      const controlMsg = await staffChannel.send({
+        content:    notifContent,
         embeds:     [buildControlEmbed(number, "open", interaction.user.id, null)],
         components: buildControlButtons("open", number),
       });
