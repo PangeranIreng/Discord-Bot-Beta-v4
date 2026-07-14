@@ -100,15 +100,15 @@ export function buildProcessingEmbed(stepIndex = 0, thumbnail = null, labelOverr
 export function buildQueueEmbed(user, position, total, etaSec) {
   return new EmbedBuilder()
     .setColor(COLOR_QUEUE)
-    .setTitle("⏳ BoomBox Queue")
+    .setTitle("🎵 BoomBox Queue")
     .setDescription(
-      `Hi <@${user.id}>\n\n` +
-      "Your link has been received.\n\n" +
-      "Please wait. Your BoomBox URL will be generated automatically.",
-    )
-    .addFields(
-      { name: "Queue Position", value: `#${position}${total > position ? ` of ${total}` : ""}`, inline: true },
-      { name: "Estimated Wait", value: `${etaSec} Seconds`, inline: true },
+      `<@${user.id}>\n\n` +
+      "Link berhasil diterima.\n\n" +
+      `**Posisi antrean:**\n#${position}${total > 1 ? ` dari ${total}` : ""}\n\n` +
+      `**Estimasi:**\n±${etaSec} detik\n\n` +
+      "Mohon tunggu.\n" +
+      "BoomBox akan otomatis dikirim ketika proses selesai.\n\n" +
+      "_Pesan ini hanya dapat dilihat oleh kamu._",
     )
     .setFooter({ text: FOOTER_TEXT });
 }

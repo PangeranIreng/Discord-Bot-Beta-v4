@@ -20,6 +20,8 @@ import { handleTicketInteraction } from "./ticket/ticketInteraction.js";
 import { updateTicketDashboard } from "./ticket/ticketDashboard.js";
 import { ticketDB } from "./ticket/ticketDB.js";
 import { handleBugReportInteraction } from "./bugreport/bugReportInteraction.js";
+import { handleCpanelInteraction } from "./cpanel/cpanelInteraction.js";
+import { handleHelpInteraction } from "./commands/help.js";
 
 const SECRETS_POLL_MS = 3000;
 
@@ -76,6 +78,7 @@ function startBot(secrets) {
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
+      GatewayIntentBits.GuildMembers,
     ],
     partials: [Partials.Message, Partials.Channel],
   });
@@ -96,6 +99,8 @@ function startBot(secrets) {
     try {
       commands = await loadCommands();
       await deployCommands(client, commands);
+      // Store commands on client for the help interaction handler
+      client._helpCommands = commands;
     } catch (err) {
       logger.error("Gagal memuat/mendaftarkan slash command", err);
       await logError({
@@ -211,6 +216,7 @@ function startBot(secrets) {
       if (!isBtn && !isSelect && !isModal) return;
 
       const id = interaction.customId ?? "";
+
       if (id.startsWith("mon:")) {
         await handleMonitoringInteraction(interaction, client);
       } else if (id.startsWith("ticket:")) {
@@ -223,11 +229,15 @@ function startBot(secrets) {
         await handleBoomBoxLogInteraction(interaction);
       } else if (isBtn && id.startsWith("sk:")) {
         await handleScanButtonInteraction(interaction);
+      } else if (id.startsWith("cp:")) {
+        await handleCpanelInteraction(interaction);
+      } else if (id === "help:category") {
+        await handleHelpInteraction(interaction);
       }
     } catch (err) {
       logger.error("Kesalahan tak terduga saat memproses interaksi", err);
       await logError({
-        feature: interaction.isChatInputCommand() ? "Commands" : "BoomBox",
+        feature: interaction.isChatInputCommand() ? "Commands" : "Interaction",
         command: interaction.isChatInputCommand() ? `/${interaction.commandName}` : interaction.customId,
         reason:  err?.message ?? String(err),
         stage:   "interactionCreate",

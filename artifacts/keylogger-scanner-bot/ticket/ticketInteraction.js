@@ -1,17 +1,19 @@
 /**
  * ticketInteraction.js — Handles all Discord interactions whose customId
- * starts with "ticket:" (panel button, claim/close buttons, dashboard nav
- * buttons + select menus).
+ * starts with "ticket:" (panel button, claim/close/transcript/delete buttons,
+ * dashboard nav buttons + select menus).
  *
- *   ticket:open                                → open a new ticket
- *   ticket:claim:<number>                      → claim
- *   ticket:close:<number>                      → close
+ *   ticket:open
+ *   ticket:claim:<number>
+ *   ticket:close:<number>
+ *   ticket:transcript:<number>
+ *   ticket:delete:<number>
  *   ticket:dash:nav:<first|prev|refresh|next|last>:<page>:<filter>
  *   ticket:dash:pagesel:<filter>  (select, value = page number string)
  *   ticket:dash:filtersel         (select, value = filter string)
  */
 
-import { openTicket, claimTicket, closeTicket } from "./ticketHandler.js";
+import { openTicket, claimTicket, closeTicket, transcriptTicket, deleteTicket } from "./ticketHandler.js";
 import { buildDashboardEmbed, buildDashboardComponents } from "./ticketDashboard.js";
 import { ticketDB } from "./ticketDB.js";
 import { logger } from "../utils/logger.js";
@@ -34,6 +36,18 @@ export async function handleTicketInteraction(interaction) {
     const closeMatch = /^ticket:close:(\d+)$/.exec(id);
     if (closeMatch) {
       await closeTicket(interaction, Number(closeMatch[1]));
+      return;
+    }
+
+    const transcriptMatch = /^ticket:transcript:(\d+)$/.exec(id);
+    if (transcriptMatch) {
+      await transcriptTicket(interaction, Number(transcriptMatch[1]));
+      return;
+    }
+
+    const deleteMatch = /^ticket:delete:(\d+)$/.exec(id);
+    if (deleteMatch) {
+      await deleteTicket(interaction, Number(deleteMatch[1]));
       return;
     }
 

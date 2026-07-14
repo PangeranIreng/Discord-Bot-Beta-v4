@@ -1,6 +1,6 @@
 /**
  * ticketHandler.js — Core Ticket lifecycle: panel send, open, first-reply,
- * claim, close.
+ * claim, close, transcript, delete.
  *
  * Thread visibility note: private threads are only visible to explicitly
  * added members, OR any member with the "Manage Threads" permission on the
@@ -12,11 +12,11 @@
  * explicitly); Owner/Developer/Handler staff get automatic access as long
  * as their role(s) carry "Manage Threads" (bundled into Administrator, or
  * grantable directly) — a one-time server permission setup, not a per-ticket
- * step. Claim/Close actions are independently permission-checked on every
- * click regardless of thread visibility.
+ * step. Claim/Close/Transcript/Delete actions are independently
+ * permission-checked on every click regardless of thread visibility.
  */
 
-import { ChannelType } from "discord.js";
+import { ChannelType, AttachmentBuilder } from "discord.js";
 import { ticketDB } from "./ticketDB.js";
 import { isStaff } from "../commands/permissions.js";
 import {
@@ -125,7 +125,7 @@ export async function openTicket(interaction) {
   const statusMsg = await thread.send({ embeds: [buildTicketStatusEmbed(number, "open", null)] });
   ticketDB.updateTicket(thread.id, { statusMessageId: statusMsg.id });
 
-  // Claim/Close controls live only in the staff-only Ticket Logs channel.
+  // Claim/Close/Transcript/Delete controls live only in the staff-only Ticket Logs channel.
   const logsChannel = await interaction.client.channels.fetch(config.logsChannelId).catch(() => null);
   if (logsChannel?.isTextBased()) {
     try {
@@ -243,7 +243,7 @@ export async function closeTicket(interaction, ticketNumber) {
   if (ticket.controlMessageId && interaction.message?.id === ticket.controlMessageId) {
     await interaction.update({
       embeds:     [buildControlEmbed(ticketNumber, "closed", ticket.userId, ticket.handlerId)],
-      components: [],
+      components: buildControlButtons("closed", ticketNumber),
     });
   } else {
     await interaction.reply({ content: "✅ Ticket ditutup.", ephemeral: true }).catch(() => {});
@@ -264,6 +264,142 @@ export async function closeTicket(interaction, ticketNumber) {
       error:   e,
     }).catch(() => {});
   }
+
+  await updateTicketDashboard(interaction.client);
+}
+
+// ── Transcript ───────────────────────────────────────────────────────────
+
+/**
+ * Fetch all messages from the ticket thread and return them as a formatted
+ * text transcript. Paginates through the Discord API to get all messages.
+ */
+async function fetchTranscript(client, ticket) {
+  const thread = await client.channels.fetch(ticket.threadId).catch(() => null);
+  if (!thread) return null;
+
+  const allMessages = [];
+  let lastId = null;
+
+  // Paginate: Discord returns max 100 per fetch
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const opts = { limit: 100 };
+    if (lastId) opts.before = lastId;
+    try {
+      const batch = await thread.messages.fetch(opts);
+      if (batch.size === 0) break;
+      allMessages.push(...batch.values());
+      lastId = batch.last()?.id;
+      if (batch.size < 100) break;
+    } catch (e) {
+      logger.warn(`[Ticket] Transcript fetch error: ${e.message}`);
+      break;
+    }
+  }
+
+  // Sort oldest → newest
+  allMessages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+
+  const lines = [
+    `=== TICKET TRANSCRIPT ===`,
+    `Ticket #${padTicketNumber(ticket.number)}`,
+    `Status: ${ticket.status}`,
+    `Created: ${new Date(ticket.createdAt).toUTCString()}`,
+    ticket.closedAt ? `Closed:  ${new Date(ticket.closedAt).toUTCString()}` : "",
+    `Requester: ${ticket.userId}`,
+    ticket.handlerId ? `Handler: ${ticket.handlerId}` : "",
+    `Total Messages: ${allMessages.length}`,
+    `========================\n`,
+  ].filter(Boolean);
+
+  for (const msg of allMessages) {
+    const ts  = new Date(msg.createdTimestamp).toUTCString();
+    const tag = msg.author?.tag ?? msg.author?.username ?? "Unknown";
+    const id  = msg.author?.id ?? "?";
+    const content = msg.content || (msg.embeds.length > 0 ? "[embed]" : "[no content]");
+    const attachments = msg.attachments.size > 0
+      ? `\n  [Attachments: ${[...msg.attachments.values()].map((a) => a.url).join(", ")}]`
+      : "";
+    lines.push(`[${ts}] ${tag} (${id}):\n  ${content}${attachments}\n`);
+  }
+
+  return lines.join("\n");
+}
+
+export async function transcriptTicket(interaction, ticketNumber) {
+  const config = ticketDB.getConfig();
+  if (!isHandler(interaction.member, config)) {
+    await interaction.reply({ content: "❌ Kamu tidak memiliki izin untuk mengambil transcript.", ephemeral: true });
+    return;
+  }
+
+  const ticket = ticketDB.getTicketByNumber(ticketNumber);
+  if (!ticket) {
+    await interaction.reply({ content: "❌ Ticket tidak ditemukan.", ephemeral: true });
+    return;
+  }
+
+  await interaction.deferReply({ ephemeral: true });
+
+  try {
+    const text = await fetchTranscript(interaction.client, ticket);
+    if (!text) {
+      await interaction.editReply({ content: "❌ Gagal mengambil transcript — thread tidak ditemukan." });
+      return;
+    }
+
+    const attachment = new AttachmentBuilder(Buffer.from(text, "utf-8"), {
+      name: `ticket-${padTicketNumber(ticket.number)}-transcript.txt`,
+    });
+
+    await interaction.editReply({
+      content: `📄 **Transcript Ticket #${padTicketNumber(ticket.number)}**`,
+      files:   [attachment],
+    });
+  } catch (e) {
+    logger.error(`[Ticket] Transcript error: ${e.message}`);
+    await interaction.editReply({ content: `❌ Gagal membuat transcript: ${e.message}` }).catch(() => {});
+  }
+}
+
+// ── Delete ───────────────────────────────────────────────────────────────
+
+export async function deleteTicket(interaction, ticketNumber) {
+  if (!isStaff(interaction.member)) {
+    await interaction.reply({ content: "❌ Hanya Owner/Developer yang dapat menghapus Ticket.", ephemeral: true });
+    return;
+  }
+
+  const ticket = ticketDB.getTicketByNumber(ticketNumber);
+  if (!ticket) {
+    await interaction.reply({ content: "❌ Ticket tidak ditemukan.", ephemeral: true });
+    return;
+  }
+
+  await interaction.deferReply({ ephemeral: true });
+
+  // Delete the thread
+  const thread = await interaction.client.channels.fetch(ticket.threadId).catch(() => null);
+  if (thread) {
+    await thread.delete("Ticket dihapus oleh staff").catch((e) => {
+      logger.warn(`[Ticket] Gagal hapus thread ${ticket.threadId}: ${e.message}`);
+    });
+  }
+
+  // Remove control message from logs channel (the message we're interacting from)
+  // Note: interaction.message will be gone after the thread delete in some cases,
+  // so we edit first, then try to delete.
+  const logsChannel = await interaction.client.channels.fetch(ticketDB.getConfig().logsChannelId ?? "").catch(() => null);
+  if (logsChannel && ticket.controlMessageId) {
+    const ctrlMsg = await logsChannel.messages.fetch(ticket.controlMessageId).catch(() => null);
+    if (ctrlMsg) await ctrlMsg.delete().catch(() => {});
+  }
+
+  // Mark ticket as deleted in DB (preserve history, just mark status)
+  ticketDB.updateTicket(ticket.threadId, { status: "closed", closedAt: new Date().toISOString() });
+
+  await interaction.editReply({ content: `🗑️ Ticket #${padTicketNumber(ticketNumber)} berhasil dihapus.` }).catch(() => {});
 
   await updateTicketDashboard(interaction.client);
 }

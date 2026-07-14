@@ -10,7 +10,7 @@
 
 import { logger } from "../utils/logger.js";
 
-const MAX_CONCURRENT = 4; // within the 3~5 simultaneous jobs spec'd
+const MAX_CONCURRENT = 5; // max 5 simultaneous BoomBox jobs per spec
 
 /** @type {Set<object>} */
 const running = new Set();

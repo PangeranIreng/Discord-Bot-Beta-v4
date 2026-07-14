@@ -2,28 +2,40 @@
  * boomboxLogInteraction.js — Handles all Discord interactions whose customId
  * starts with "bblog:" (BoomBox Logs dashboard nav buttons + page select).
  *
- *   bblog:nav:<prev|refresh|next>:<page>
- *   bblog:pagesel  (select, value = page number string)
+ *   bblog:nav:<first|prev|refresh|next|last>:<page>
+ *   bblog:viewall:<page>   →  ephemeral page-list + jump select
+ *   bblog:pagesel          (select, value = page number string)
  */
 
 import { db } from "./db.js";
-import { buildLogDashboardEmbed, buildLogDashboardComponents } from "./boomboxLogDashboard.js";
+import {
+  buildLogDashboardEmbed,
+  buildLogDashboardComponents,
+  buildViewAllEmbed,
+  buildViewAllSelectRow,
+  resolvePage,
+} from "./boomboxLogDashboard.js";
 import { logger } from "../utils/logger.js";
 
 export async function handleBoomBoxLogInteraction(interaction) {
   const id = interaction.customId ?? "";
 
   try {
-    const navMatch = /^bblog:nav:(prev|refresh|next):(\d+)$/.exec(id);
+    // ── First / Prev / Refresh / Next / Last ─────────────────────────────
+    const navMatch = /^bblog:nav:(first|prev|refresh|next|last):(\d+)$/.exec(id);
     if (navMatch) {
       const [, action, curPageStr] = navMatch;
       const curPage = Number(curPageStr);
-      let page = curPage;
-      if (action === "prev")    page = Math.max(1, curPage - 1);
-      else if (action === "next")    page = curPage + 1;
-      // "refresh" keeps the current page as-is.
-
       const entries = db.getLogState().entries ?? [];
+      const { totalPages } = resolvePage(entries, curPage);
+
+      let page = curPage;
+      if (action === "first")      page = 1;
+      else if (action === "prev")  page = Math.max(1, curPage - 1);
+      else if (action === "next")  page = Math.min(totalPages, curPage + 1);
+      else if (action === "last")  page = totalPages;
+      // "refresh" keeps current page as-is
+
       await interaction.update({
         embeds:     [buildLogDashboardEmbed(entries, page)],
         components: buildLogDashboardComponents(entries, page),
@@ -31,13 +43,41 @@ export async function handleBoomBoxLogInteraction(interaction) {
       return;
     }
 
+    // ── View All Pages ────────────────────────────────────────────────────
+    const viewAllMatch = /^bblog:viewall:(\d+)$/.exec(id);
+    if (viewAllMatch) {
+      const entries    = db.getLogState().entries ?? [];
+      const { totalPages } = resolvePage(entries, 1);
+      await interaction.reply({
+        embeds:     [buildViewAllEmbed(entries)],
+        components: buildViewAllSelectRow(totalPages),
+        ephemeral:  true,
+      }).catch(() => {});
+      return;
+    }
+
+    // ── Page select ───────────────────────────────────────────────────────
     if (id === "bblog:pagesel" && interaction.isStringSelectMenu()) {
       const page    = Number(interaction.values[0]);
       const entries = db.getLogState().entries ?? [];
-      await interaction.update({
-        embeds:     [buildLogDashboardEmbed(entries, page)],
-        components: buildLogDashboardComponents(entries, page),
-      });
+
+      // This select could come from either the dashboard message (update in
+      // place) or from a "View All Pages" ephemeral reply (update that reply).
+      const isEphemeral = interaction.message?.flags?.has("Ephemeral") ??
+        interaction.message?.ephemeral ?? false;
+
+      if (isEphemeral) {
+        // Jump request from View All Pages ephemeral — just acknowledge
+        await interaction.reply({
+          content: `Navigasi ke **Halaman ${page}** — buka dashboard untuk melihat perubahannya.`,
+          ephemeral: true,
+        }).catch(() => {});
+      } else {
+        await interaction.update({
+          embeds:     [buildLogDashboardEmbed(entries, page)],
+          components: buildLogDashboardComponents(entries, page),
+        });
+      }
       return;
     }
   } catch (e) {
