@@ -6,9 +6,9 @@
     "2026-07-13": {}
   },
   "statistics": {
-    "total": 20,
+    "total": 25,
     "byPlatform": {
-      "YouTube": 20
+      "YouTube": 25
     }
   },
   "history": [
@@ -200,11 +200,91 @@
       "duration": 296,
       "limitRemaining": "Unlimited",
       "timestamp": "2026-07-14T08:55:00.881Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "DJ 2PAC CHANGES X CINDAI BY ER'BEAST | VIRAL FYP TIKTOK TERBARU 2026 YG KALIAN CARI-CARI!",
+      "originalUrl": "https://youtu.be/DpocfMZJb3I?si=FVwAe8Xtk1UakS4L",
+      "boomboxUrl": "https://d.top4top.io/m_38479j5zj0.mp3",
+      "duration": 287,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T09:27:58.381Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Surat Cinta Untuk Starla (Virgoun)  x Bahagia Lagi (Piche Kota) | Lyrics",
+      "originalUrl": "https://youtu.be/nNcWorl87h0?si=XPi7nmv4PjjunFm1",
+      "boomboxUrl": "https://e.top4top.io/m_3847m5g4n0.mp3",
+      "duration": 267,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T09:28:01.203Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "AJENG FEBRIA - KEONG RACUN (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | MULUT KUMAT KEMOT MATANYA MELOTOT",
+      "originalUrl": "https://youtu.be/XY9JR07il_U?si=L6wTebg8z_zCsOQC",
+      "boomboxUrl": "https://f.top4top.io/m_38472kc4m0.mp3",
+      "duration": 392,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T09:28:03.832Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Chandelier X Impossible X Wildflower X Drivers License X The Cut That Always Bleedss",
+      "originalUrl": "https://youtu.be/y9j3AMboES0?si=LC_BxWDJ9uZcp9RF",
+      "boomboxUrl": "https://h.top4top.io/m_3847puvoa0.mp3",
+      "duration": 302,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T09:28:11.777Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "DJ KAULAH SELURUH CINTA BAGIKU | DJ SELURUH CINTA SOUND JJ VIRAL TIKTOK YANG KALIAN CARI CARI!!!",
+      "originalUrl": "https://youtu.be/-5GHESF3dLY?si=TXC8ESsRbM3-EaVZ",
+      "boomboxUrl": "https://a.top4top.io/m_3847eas2i0.mp3",
+      "duration": 783,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T09:28:43.687Z"
     }
   ],
   "logState": {
     "messageId": "1526256015941832776",
     "entries": [
+      {
+        "title": "DJ KAULAH SELURUH CINTA BAGIKU | DJ SELURUH CINTA SOUND JJ VIRAL TIKTOK YANG KALIAN CARI CARI!!!",
+        "duration": 783,
+        "boomboxUrl": "https://a.top4top.io/m_3847eas2i0.mp3",
+        "timestamp": "2026-07-14T09:28:43.687Z"
+      },
+      {
+        "title": "Chandelier X Impossible X Wildflower X Drivers License X The Cut That Always Bleedss",
+        "duration": 302,
+        "boomboxUrl": "https://h.top4top.io/m_3847puvoa0.mp3",
+        "timestamp": "2026-07-14T09:28:11.777Z"
+      },
+      {
+        "title": "AJENG FEBRIA - KEONG RACUN (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | MULUT KUMAT KEMOT MATANYA MELOTOT",
+        "duration": 392,
+        "boomboxUrl": "https://f.top4top.io/m_38472kc4m0.mp3",
+        "timestamp": "2026-07-14T09:28:03.832Z"
+      },
+      {
+        "title": "Surat Cinta Untuk Starla (Virgoun)  x Bahagia Lagi (Piche Kota) | Lyrics",
+        "duration": 267,
+        "boomboxUrl": "https://e.top4top.io/m_3847m5g4n0.mp3",
+        "timestamp": "2026-07-14T09:28:01.203Z"
+      },
+      {
+        "title": "DJ 2PAC CHANGES X CINDAI BY ER'BEAST | VIRAL FYP TIKTOK TERBARU 2026 YG KALIAN CARI-CARI!",
+        "duration": 287,
+        "boomboxUrl": "https://d.top4top.io/m_38479j5zj0.mp3",
+        "timestamp": "2026-07-14T09:27:58.381Z"
+      },
       {
         "title": "ABBA - The Winner Takes It All (Lyrics)",
         "duration": 296,
