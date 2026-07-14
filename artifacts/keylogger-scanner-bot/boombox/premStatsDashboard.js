@@ -13,30 +13,35 @@ import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "disc
 import { premDB, db } from "./db.js";
 import { logger } from "../utils/logger.js";
 
-const SEP      = "━━━━━━━━━━━━━━━━━━";
+const SEP      = "━━━━━━━━━━━━━━━━";
 const MAX_LIST = 20; // max entries per section to avoid embed size overflow
 
 // ── Time helpers ──────────────────────────────────────────────────────────
 
-/** Format ms-until-expiry into "2d 5h 20m", "3h 20m", "25m", or "Permanent". */
-function formatRemaining(expiresAt) {
-  if (!expiresAt) return "Permanent";
+/**
+ * Format ms-until-expiry into multiline Indonesian:
+ *   "2 Hari\n5 Jam\n20 Menit"
+ * Returns null for permanent (caller shows ♾️ Permanen).
+ */
+function formatSisa(expiresAt) {
+  if (!expiresAt) return null; // permanent
+
   const ms = new Date(expiresAt).getTime() - Date.now();
   if (ms <= 0) return "Berakhir";
 
   const totalSec = Math.floor(ms / 1000);
-  const days     = Math.floor(totalSec / 86400);
-  const hours    = Math.floor((totalSec % 86400) / 3600);
-  const mins     = Math.floor((totalSec % 3600)  / 60);
+  const days  = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins  = Math.floor((totalSec % 3600)  / 60);
 
   const parts = [];
-  if (days  > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  if (mins  > 0 || parts.length === 0) parts.push(`${mins}m`);
-  return parts.join(" ");
+  if (days  > 0) parts.push(`${days} Hari`);
+  if (hours > 0) parts.push(`${hours} Jam`);
+  if (mins  > 0 || parts.length === 0) parts.push(`${mins} Menit`);
+  return parts.join("\n");
 }
 
-/** Current time in WIB (UTC+7), formatted as the spec requires. */
+/** Current time in WIB (UTC+7). */
 function formatWIB() {
   const now = new Date();
   const wib = new Date(now.getTime() + 7 * 3_600_000);
@@ -47,7 +52,7 @@ function formatWIB() {
   const mi  = String(wib.getUTCMinutes()).padStart(2, "0");
   const s   = String(wib.getUTCSeconds()).padStart(2, "0");
   const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni",
-                   "Juli","Agustus","September","Oktober","November","Desember"];
+                  "Juli","Agustus","September","Oktober","November","Desember"];
   return { date: `${d} ${MONTHS[mo]} ${y}`, time: `${h}:${mi}:${s} WIB` };
 }
 
@@ -78,101 +83,111 @@ export function buildPremStatsEmbed() {
   const { premUsers, premRoles, limUsers, limRoles } = calcStats();
   const wib = formatWIB();
 
-  const allPrem    = [...premUsers, ...premRoles];
-  const allLim     = [...limUsers,  ...limRoles];
-  const permPrem   = allPrem.filter(r => r.type === "permanent").length;
-  const tempPrem   = allPrem.filter(r => r.type === "temporary").length;
-  const permLim    = allLim.filter(r  => r.type === "permanent").length;
-  const tempLim    = allLim.filter(r  => r.type === "temporary").length;
+  const allPrem  = [...premUsers, ...premRoles];
+  const allLim   = [...limUsers,  ...limRoles];
+  const permPrem = allPrem.filter(r => r.type === "permanent").length;
+  const tempPrem = allPrem.filter(r => r.type === "temporary").length;
 
-  // ── Section: Summary ─────────────────────────────────────────────────
-  const summaryBlock = [
-    `📊 **Summary**`,
-    `Premium Active : **${allPrem.length}**`,
-    `Premium Permanent : **${permPrem}**`,
-    `Premium Temporary : **${tempPrem}**`,
-  ].join("\n");
+  // ── Section: Ringkasan ───────────────────────────────────────────────
+  const summaryLines = [
+    `📊 **Ringkasan**`,
+    ``,
+    `👑 Premium Aktif : **${allPrem.length}**`,
+    `💎 Premium Permanen : **${permPrem}**`,
+    `⏳ Premium Sementara : **${tempPrem}**`,
+    `🎵 Limit Kustom : **${allLim.length}**`,
+  ];
 
-  // ── Section: Custom Limit ────────────────────────────────────────────
-  const limitBlock = [
-    `🎵 **Custom Limit**`,
-    `Limit Active : **${allLim.length}**`,
-    `Limit Permanent : **${permLim}**`,
-    `Limit Temporary : **${tempLim}**`,
-  ].join("\n");
-
-  // ── Section: Premium Users ───────────────────────────────────────────
+  // ── Section: Pengguna Premium ────────────────────────────────────────
   const premEntries = [];
   for (const u of premUsers.slice(0, MAX_LIST)) {
-    premEntries.push(`<@${u.userId}>\nUnlimited — ${formatRemaining(u.expiresAt)}`);
+    const sisa = formatSisa(u.expiresAt);
+    const sisaBlock = sisa === null
+      ? `♾️ Permanen`
+      : `⏳ Sisa :\n${sisa}`;
+    premEntries.push(`👤 <@${u.userId}>\n\n👑 Premium\n\n${sisaBlock}`);
   }
   for (const r of premRoles.slice(0, MAX_LIST - premEntries.length)) {
-    premEntries.push(`<@&${r.roleId}>\nUnlimited — ${formatRemaining(r.expiresAt)}`);
+    const sisa = formatSisa(r.expiresAt);
+    const sisaBlock = sisa === null
+      ? `♾️ Permanen`
+      : `⏳ Sisa :\n${sisa}`;
+    premEntries.push(`👤 <@&${r.roleId}>\n\n👑 Premium\n\n${sisaBlock}`);
   }
   if (allPrem.length > MAX_LIST) {
     premEntries.push(`*... dan ${allPrem.length - MAX_LIST} lainnya*`);
   }
-  const premUsersBlock = [
-    `👑 **Premium Users**`,
-    premEntries.length > 0 ? premEntries.join("\n") : "*Tidak ada*",
+
+  const premSection = [
+    `👥 **Pengguna Premium**`,
+    ``,
+    premEntries.length > 0
+      ? premEntries.join(`\n\n`)
+      : `*Belum ada pengguna Premium.*`,
   ].join("\n");
 
-  // ── Section: Custom Limit Users ──────────────────────────────────────
+  // ── Section: Pengguna Limit Kustom ───────────────────────────────────
   const limEntries = [];
   for (const u of limUsers.slice(0, MAX_LIST)) {
-    const usage    = db.getUsage(u.userId);
-    const sisa     = Math.max(0, u.limit - usage);
-    const expLine  = u.type === "permanent"
-      ? "Permanent"
-      : `Expire : ${formatRemaining(u.expiresAt)}`;
+    const usage = db.getUsage(u.userId);
+    const sisa  = Math.max(0, u.limit - usage);
+    const sisa2 = formatSisa(u.expiresAt);
+    const berlakuBlock = sisa2 === null
+      ? `♾️ Permanen`
+      : `⏳ Berlaku :\n${sisa2}`;
     limEntries.push(
-      `<@${u.userId}>\nLimit : ${u.limit} / Hari\nSisa : ${sisa}\n${expLine}`
+      `👤 <@${u.userId}>\n\n📦 Limit : ${u.limit} / Hari\n\n📉 Sisa : ${sisa}\n\n${berlakuBlock}`
     );
   }
   for (const r of limRoles.slice(0, MAX_LIST - limEntries.length)) {
-    const expLine = r.type === "permanent"
-      ? "Permanent"
-      : `Expire : ${formatRemaining(r.expiresAt)}`;
-    limEntries.push(`<@&${r.roleId}>\nLimit : ${r.limit} / Hari\n${expLine}`);
+    const sisa2 = formatSisa(r.expiresAt);
+    const berlakuBlock = sisa2 === null
+      ? `♾️ Permanen`
+      : `⏳ Berlaku :\n${sisa2}`;
+    limEntries.push(
+      `👤 <@&${r.roleId}>\n\n📦 Limit : ${r.limit} / Hari\n\n${berlakuBlock}`
+    );
   }
   if (allLim.length > MAX_LIST) {
     limEntries.push(`*... dan ${allLim.length - MAX_LIST} lainnya*`);
   }
-  const limUsersBlock = [
-    `🎵 **Custom Limit Users**`,
-    limEntries.length > 0 ? limEntries.join("\n\n") : "*Tidak ada*",
+
+  const limSection = [
+    `🎵 **Pengguna Limit Kustom**`,
+    ``,
+    limEntries.length > 0
+      ? limEntries.join(`\n\n`)
+      : `*Belum ada pengguna Limit Kustom.*`,
   ].join("\n");
 
-  // ── Section: Last Update ─────────────────────────────────────────────
-  const updateBlock = `🕒 **Last Update**\n${wib.date}\n${wib.time}`;
+  // ── Section: Terakhir Diperbarui ─────────────────────────────────────
+  const updateSection = `🕒 **Terakhir Diperbarui**\n\n${wib.date}\n${wib.time}`;
 
   // ── Assemble description ─────────────────────────────────────────────
   const desc = [
     SEP,
-    summaryBlock,
+    summaryLines.join("\n"),
     SEP,
-    limitBlock,
+    premSection,
     SEP,
-    premUsersBlock,
+    limSection,
     SEP,
-    limUsersBlock,
+    updateSection,
     SEP,
-    updateBlock,
-  ].join("\n");
+  ].join("\n\n");
 
   return new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle("👑 Premium Statistics")
     .setDescription(desc.slice(0, 4096)) // Discord hard limit
-    .setFooter({ text: "Auto-update on every change • /premstats" })
-    .setTimestamp();
+    .setFooter({ text: "🔄 Diperbarui otomatis setiap ada perubahan." });
 }
 
 function buildRefreshButton() {
   return new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId("ps:refresh")
-      .setLabel("Refresh")
+      .setLabel("Perbarui")
       .setEmoji("🔄")
       .setStyle(ButtonStyle.Secondary),
   );

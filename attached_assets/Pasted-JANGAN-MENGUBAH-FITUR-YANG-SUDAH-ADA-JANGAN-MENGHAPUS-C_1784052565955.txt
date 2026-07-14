@@ -1,0 +1,260 @@
+JANGAN MENGUBAH FITUR YANG SUDAH ADA.
+
+JANGAN MENGHAPUS COMMAND.
+
+JANGAN MENGUBAH DATABASE.
+
+JANGAN MENGUBAH SISTEM PREMIUM.
+
+JANGAN MENGUBAH SISTEM SETLIMIT.
+
+JANGAN MENGUBAH AUTO UPDATE.
+
+JANGAN MENGUBAH EMBED LAIN.
+
+Yang diubah HANYA tampilan /premstats.
+
+==================================================
+PREMIUM STATISTICS
+==================================================
+
+Tampilan sekarang masih terlihat seperti data debug.
+
+Rapikan agar tampil modern seperti embed BoomBox.
+
+Gunakan Bahasa Indonesia seluruhnya.
+
+==================================================
+1. GANTI SEMUA TEKS KE BAHASA INDONESIA
+==================================================
+
+Summary
+→ Ringkasan
+
+Premium Active
+→ Premium Aktif
+
+Premium Permanent
+→ Premium Permanen
+
+Premium Temporary
+→ Premium Sementara
+
+Custom Limit
+→ Limit Kustom
+
+Custom Limit Users
+→ Pengguna Limit Kustom
+
+Premium Users
+→ Pengguna Premium
+
+Last Update
+→ Terakhir Diperbarui
+
+Refresh
+→ Perbarui
+
+Auto-update on every change
+→ Diperbarui otomatis setiap ada perubahan.
+
+==================================================
+2. USER HARUS DI MENTION
+==================================================
+
+Jangan tampilkan ID seperti:
+
+<@1526499408282390619>
+
+Pastikan benar-benar me-mention user Discord.
+
+Contoh:
+
+👤 @PangeranIreng
+
+bukan ID mentah.
+
+==================================================
+3. TAMPILKAN STATUS USER DENGAN RAPI
+==================================================
+
+Contoh untuk Premium:
+
+👤 @User
+
+👑 Premium
+
+⏳ Sisa :
+6 Hari
+5 Jam
+20 Menit
+
+atau
+
+♾️ Permanen
+
+==================================================
+4. LIMIT KUSTOM
+==================================================
+
+Untuk pengguna SetLimit tampilkan:
+
+👤 @User
+
+📦 Limit : 20 / Hari
+
+📉 Sisa : 15
+
+Jika sementara:
+
+⏳ Berlaku :
+2 Hari
+4 Jam
+18 Menit
+
+Jika permanen:
+
+♾️ Permanen
+
+==================================================
+5. JIKA KOSONG
+==================================================
+
+Jangan tampilkan:
+
+Tidak ada
+
+Lebih baik tampilkan:
+
+Belum ada pengguna Premium.
+
+atau
+
+Belum ada pengguna Limit Kustom.
+
+==================================================
+6. TAMPILAN EMBED
+==================================================
+
+Rapikan spacing.
+
+Kurangi garis pemisah yang terlalu banyak.
+
+Gunakan layout yang lebih bersih.
+
+Contoh:
+
+👑 Premium Statistics
+
+━━━━━━━━━━━━━━━━
+
+📊 Ringkasan
+
+👑 Premium Aktif : 2
+
+💎 Premium Permanen : 1
+
+⏳ Premium Sementara : 1
+
+━━━━━━━━━━━━━━━━
+
+👥 Pengguna Premium
+
+👤 @RajaIblis
+
+👑 Premium
+
+♾️ Permanen
+
+━━━━━━━━━━━━━━━━
+
+🎵 Pengguna Limit Kustom
+
+👤 @PangeranIreng
+
+📦 Limit : 20 / Hari
+
+📉 Sisa : 15
+
+⏳ Berlaku :
+2 Hari
+8 Jam
+
+━━━━━━━━━━━━━━━━
+
+🕒 Terakhir Diperbarui
+
+15 Juli 2026
+01:20:35 WIB
+
+━━━━━━━━━━━━━━━━
+
+Footer:
+
+🔄 Diperbarui otomatis setiap ada perubahan.
+
+==================================================
+7. AUTO UPDATE
+==================================================
+
+Tetap menggunakan edit message.
+
+Jangan mengirim pesan baru.
+
+Tetap update otomatis ketika:
+
+• Premium ditambah
+
+• Premium dihapus
+
+• Premium berakhir
+
+• SetLimit dibuat
+
+• SetLimit dihapus
+
+• SetLimit berakhir
+
+• Limit berubah
+
+==================================================
+8. BUTTON
+==================================================
+
+Button tetap ada.
+
+Ubah teks:
+
+Refresh
+
+menjadi
+
+🔄 Perbarui
+
+==================================================
+9. FINAL CHECK
+==================================================
+
+Pastikan:
+
+✅ Bahasa Indonesia seluruhnya.
+
+✅ Mention user tampil normal.
+
+✅ Tidak ada ID mentah.
+
+✅ Layout lebih rapi.
+
+✅ Auto update tetap bekerja.
+
+✅ Tidak mengubah database.
+
+✅ Tidak mengubah command.
+
+✅ Tidak mengubah sistem premium.
+
+✅ Tidak mengubah sistem setlimit.
+
+✅ Tidak mengubah fitur lain.
+
+Jangan tandai pekerjaan selesai sebelum seluruh tampilan /premstats benar-benar sudah diperbarui.
