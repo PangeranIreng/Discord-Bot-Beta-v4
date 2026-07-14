@@ -33,10 +33,8 @@ import {
   buildResultEmbed,
   buildDurationLimitEmbed,
   buildErrorEmbed,
-  buildLogEmbed,
-  buildLogDescription,
-  LOG_EMBED_DESC_SAFE_LIMIT,
 } from "./boomboxEmbed.js";
+import { updateBoomBoxLogDashboard } from "./boomboxLogDashboard.js";
 import { logError } from "../utils/errorLogger.js";
 import { logger }   from "../utils/logger.js";
 
@@ -181,73 +179,57 @@ function buildButtons(boomboxUrl) {
 }
 
 // ── BoomBox Logs System ───────────────────────────────────────────────────────
-// Archive of generated BoomBox URLs only — no requester info. One embed is
-// edited in place (newest entry inserted at the top); a new embed message is
-// only started when the current one is about to exceed Discord's size limit.
+// Archive of generated BoomBox URLs only — no requester info. A single
+// dashboard message is edited in place and paginated (mirrors Ticket Logs);
+// see boomboxLogDashboard.js for the embed/component builders and the
+// edit-or-recreate logic.
+
+/** Newest-first entries kept in the log; older ones roll off. */
+const MAX_LOG_ENTRIES = 300;
+
+// All log-append operations are serialized through this queue so two
+// BoomBox completions finishing close together can never race on the same
+// read-modify-write of db.getLogState().entries — that race was the root
+// cause of some successful URLs silently never reaching BoomBox Logs
+// ("kadang tidak masuk ke logs").
+let logAppendQueue = Promise.resolve();
 
 /**
  * @param {{userId, platform, title, boomboxUrl, duration, timestamp}} entry
  *   Full internal entry (as stored in db.addHistory) — appendToLog strips
  *   userId/originalUrl/limitRemaining before anything reaches the channel.
  */
-async function appendToLog(client, entry) {
+function appendToLog(client, entry) {
   const publicEntry = {
     title:      entry.title,
-    platform:   entry.platform,
     duration:   entry.duration,
     boomboxUrl: entry.boomboxUrl,
     timestamp:  entry.timestamp,
   };
 
-  try {
-    const ch = await client.channels.fetch(BOOMBOX_CONFIG.BOOMBOX_LOG_CHANNEL_ID).catch(() => null);
-    if (!ch?.isTextBased()) {
+  const task = async () => {
+    try {
+      const state   = db.getLogState();
+      const entries = [publicEntry, ...(state.entries ?? [])].slice(0, MAX_LOG_ENTRIES);
+      db.setLogState({ entries });
+      await updateBoomBoxLogDashboard(client, { resetToFirstPage: true });
+      logger.debug(`[BoomBox] Log entry appended (${entries.length} total)`);
+    } catch (e) {
+      logger.error(`[BoomBox] Failed to update log: ${e.message}`);
       await logError({
         feature: "BoomBox",
-        reason:  `Log channel ${BOOMBOX_CONFIG.BOOMBOX_LOG_CHANNEL_ID} not found or not text-based`,
+        reason:  `Failed to update BoomBox Log: ${e.message}`,
         stage:   "Update BoomBox Log",
-      });
-      return;
+        error:   e,
+      }).catch(() => {});
     }
+  };
 
-    const state           = db.getLogState();
-    const candidateEntries = [publicEntry, ...state.entries];
-    const candidateDesc    = buildLogDescription(candidateEntries);
-
-    let logMsg = null;
-    if (state.messageId) {
-      try {
-        logMsg = await ch.messages.fetch(state.messageId);
-      } catch {
-        logger.warn(`[BoomBox] Could not fetch log message ${state.messageId} — will create a new one`);
-      }
-    }
-
-    // Fits in the current embed → edit it in place, newest entry on top.
-    if (logMsg && candidateDesc.length <= LOG_EMBED_DESC_SAFE_LIMIT) {
-      await logMsg.edit({ content: "", embeds: [buildLogEmbed(candidateEntries)] });
-      db.setLogState({ messageId: logMsg.id, entries: candidateEntries });
-      logger.debug(`[BoomBox] Log embed updated (${candidateEntries.length} entries)`);
-      return;
-    }
-
-    // No existing message, it's gone, or it's near Discord's size limit —
-    // start exactly one new embed and keep editing only that one from now on.
-    if (logMsg) logger.info(`[BoomBox] Log embed near Discord's size limit — starting a new one`);
-    const freshEntries = [publicEntry];
-    const newMsg = await ch.send({ embeds: [buildLogEmbed(freshEntries)] });
-    db.setLogState({ messageId: newMsg.id, entries: freshEntries });
-    logger.info(`[BoomBox] New BoomBox Log message created: ${newMsg.id}`);
-
-  } catch (e) {
-    logger.error(`[BoomBox] Failed to update log: ${e.message}`);
-    await logError({
-      feature: "BoomBox",
-      reason:  `Failed to update BoomBox Log: ${e.message}`,
-      stage:   "Update BoomBox Log",
-      error:   e,
-    });
-  }
+  // Chain onto the queue regardless of whether the previous task threw —
+  // task() already self-catches, so this can never actually reject, but
+  // .then(task, task) keeps the queue alive even if that ever changes.
+  logAppendQueue = logAppendQueue.then(task, task);
+  return logAppendQueue;
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────

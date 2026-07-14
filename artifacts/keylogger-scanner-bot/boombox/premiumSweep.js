@@ -25,14 +25,17 @@ async function sweepOnce(client) {
     let anyChanged = false;
 
     // ── Expired Premium users → revoke role, delete record, log ──────────
+    // NOTE: the record (with its expiresAt/type) is captured BEFORE deleting
+    // it — logging after deletion would have nothing left to describe.
     for (const userId of premDB.getExpiredPremiumUsers()) {
+      const record = premDB.getPremiumUser(userId);
       premDB.deletePremiumUser(userId);
       await revokePremiumRole(client, IDS.GUILD_ID, userId);
       await appendToPremiumLog(client, {
-        action:   "Premium Expired",
-        target:   `<@${userId}>`,
-        executor: "System (auto-expire)",
-        status:   "Expired",
+        action:      "Premium Expired",
+        target:      `<@${userId}>`,
+        expiredAt:   record?.expiresAt ?? new Date().toISOString(),
+        premiumLabel:"Temporary",
       });
       logger.info(`[Premium] Expired premium for user ${userId}`);
       anyChanged = true;
@@ -40,26 +43,45 @@ async function sweepOnce(client) {
 
     // ── Expired Premium roles → just delete record, log ───────────────────
     for (const roleId of premDB.getExpiredPremiumRoles()) {
+      const record = premDB.getPremiumRole(roleId);
       premDB.deletePremiumRole(roleId);
       await appendToPremiumLog(client, {
-        action:   "Premium Expired",
-        target:   `<@&${roleId}>`,
-        executor: "System (auto-expire)",
-        status:   "Expired",
+        action:      "Premium Expired",
+        target:      `<@&${roleId}>`,
+        expiredAt:   record?.expiresAt ?? new Date().toISOString(),
+        premiumLabel:"Temporary",
       });
       logger.info(`[Premium] Expired premium for role ${roleId}`);
       anyChanged = true;
     }
 
-    // ── Expired custom limits → clean up quietly (revert to default) ──────
+    // ── Expired custom limits → revert to default AND log ─────────────────
+    // Previously these were only deleted (logger.debug), never sent to the
+    // Premium Logs channel at all — that was the "Custom Limit habis kadang
+    // tidak masuk ke Premium Logs" bug. Now every expiry is logged, same as
+    // Premium expiry above.
     for (const userId of premDB.getExpiredCustomLimitUsers()) {
+      const record = premDB.getRawCustomLimitUser(userId);
       premDB.deleteCustomLimitUser(userId);
-      logger.debug(`[Premium] Expired custom limit for user ${userId}`);
+      await appendToPremiumLog(client, {
+        action:    "Custom Limit Expired",
+        target:    `<@${userId}>`,
+        limit:     record?.limit ?? null,
+        expiredAt: record?.expiresAt ?? new Date().toISOString(),
+      });
+      logger.info(`[Premium] Expired custom limit for user ${userId}`);
       anyChanged = true;
     }
     for (const roleId of premDB.getExpiredCustomLimitRoles()) {
+      const record = premDB.getRawCustomLimitRole(roleId);
       premDB.deleteCustomLimitRole(roleId);
-      logger.debug(`[Premium] Expired custom limit for role ${roleId}`);
+      await appendToPremiumLog(client, {
+        action:    "Custom Limit Expired",
+        target:    `<@&${roleId}>`,
+        limit:     record?.limit ?? null,
+        expiredAt: record?.expiresAt ?? new Date().toISOString(),
+      });
+      logger.info(`[Premium] Expired custom limit for role ${roleId}`);
       anyChanged = true;
     }
 

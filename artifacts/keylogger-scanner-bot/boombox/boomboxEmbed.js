@@ -19,11 +19,7 @@ const SEP14            = "━━━━━━━━━━━━━━";
 
 // BoomBox Logs archive embed — deliberately separate colors/footer/emoji set
 // from the rest of the module: it's a public, no-user-info history channel.
-const COLOR_LOG      = 0x3ba4ff;
-const LOG_FOOTER_TEXT = "Pangeran Assistant AI • BoomBox Logs";
-const LOG_SEP          = "━━━━━━━━━━━━━━━━━━";
-/** Discord hard-caps embed description at 4096 chars; stay comfortably under it. */
-export const LOG_EMBED_DESC_SAFE_LIMIT = 3900;
+export const LOG_SEP = "━━━━━━━━━━━━━━━━━━";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -173,48 +169,28 @@ export function buildErrorEmbed(err) {
 /**
  * One entry's block within the log embed description. Intentionally carries
  * NO user information (no username/mention/ID/avatar/nickname) — only the
- * BoomBox result itself, per the BoomBox Logs redesign spec.
+ * BoomBox result itself, per the BoomBox Logs redesign spec. The "Source"
+ * (platform) line is deliberately omitted per spec.
  *
- * @param {{title: string, platform: string, duration: number|null, boomboxUrl: string, timestamp: string}} entry
+ * @param {{title: string, duration: number|null, boomboxUrl: string, timestamp: string}} entry
  */
-function buildLogEntryBlock(entry) {
+export function buildLogEntryBlock(entry) {
   const ts = Math.floor(new Date(entry.timestamp).getTime() / 1000);
   return [
     `🎵 ${truncateTitle(entry.title, 60)}`,
-    "",
-    `🌍 Source : ${entry.platform}`,
     "",
     `⏱ Duration : ${formatDuration(entry.duration)}`,
     "",
     `🔗 BoomBox URL`,
     entry.boomboxUrl,
     "",
-    `🕒 <t:${ts}:R>`,
+    `🕒 Created : <t:${ts}:R>`,
   ].join("\n");
 }
 
-/**
- * Build the full log embed description from a newest-first list of entries.
- * @param {Array<object>} entries
- */
-export function buildLogDescription(entries) {
-  if (!entries || entries.length === 0) return LOG_SEP;
-  const blocks = entries.map(buildLogEntryBlock);
-  return `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
-}
-
-/**
- * Build the single BoomBox Logs embed (edited in place, newest entry on top).
- * @param {Array<object>} entries  Newest-first.
- */
-export function buildLogEmbed(entries) {
-  return new EmbedBuilder()
-    .setColor(COLOR_LOG)
-    .setTitle("🎵 BoomBox Logs")
-    .setDescription(buildLogDescription(entries))
-    .setFooter({ text: LOG_FOOTER_TEXT })
-    .setTimestamp();
-}
+// NOTE: the paginated BoomBox Logs dashboard embed itself now lives in
+// boomboxLogDashboard.js (mirrors ticket/ticketDashboard.js) — it reuses
+// buildLogEntryBlock() and LOG_SEP exported above.
 
 function classifyError(msg) {
   const m = msg.toLowerCase();

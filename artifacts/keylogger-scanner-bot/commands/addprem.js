@@ -64,6 +64,7 @@ export async function execute(interaction) {
   } else {
     premDB.setPremiumUser(target.id, record);
   }
+  premDB.setLastPremiumTarget(`${target}`);
 
   // ── Grant the real Premium role automatically (users only) ───────────────
   let roleSyncNote = "";

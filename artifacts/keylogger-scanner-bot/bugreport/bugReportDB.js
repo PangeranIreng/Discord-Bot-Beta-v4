@@ -61,6 +61,12 @@ export class BugReportDB {
     this._data.config = { ...this._data.config, ...patch };
     this._save();
   }
+
+  /** Wipe panel/logs/role config — used by /delcbug. */
+  resetConfig() {
+    this._data.config = structuredClone(DEFAULT_DB.config);
+    this._save();
+  }
 }
 
 export const bugReportDB = new BugReportDB();

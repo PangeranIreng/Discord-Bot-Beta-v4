@@ -104,6 +104,28 @@ function getLimitEntries() {
   return [...roles, ...users];
 }
 
+/** Active entries (Premium + Custom Limit) that have a real expiry, soonest first. */
+function getExpiringEntries() {
+  const now = new Date();
+
+  const premUsers = premDB.getAllPremiumUsers()
+    .filter(u => u.expiresAt && new Date(u.expiresAt) > now)
+    .map(u => ({ mention: `<@${u.userId}>`,  expiresAt: u.expiresAt, kind: "👑 Premium" }));
+  const premRoles = premDB.getAllPremiumRoles()
+    .filter(r => r.expiresAt && new Date(r.expiresAt) > now)
+    .map(r => ({ mention: `<@&${r.roleId}>`, expiresAt: r.expiresAt, kind: "👑 Premium" }));
+  const limUsers = premDB.getAllCustomLimitUsers()
+    .filter(u => premDB.getCustomLimitUser(u.userId) !== null && u.expiresAt)
+    .map(u => ({ mention: `<@${u.userId}>`,  expiresAt: u.expiresAt, kind: "🎵 Custom Limit" }));
+  const limRoles = premDB.getAllCustomLimitRoles()
+    .filter(r => premDB.getCustomLimitRole(r.roleId) !== null && r.expiresAt)
+    .map(r => ({ mention: `<@&${r.roleId}>`, expiresAt: r.expiresAt, kind: "🎵 Custom Limit" }));
+
+  const all = [...premUsers, ...premRoles, ...limUsers, ...limRoles];
+  all.sort((a, b) => new Date(a.expiresAt) - new Date(b.expiresAt));
+  return all;
+}
+
 // ── Embed builders ─────────────────────────────────────────────────────────
 
 function buildPremiumListEmbed(entries, page, totalPages) {
@@ -139,6 +161,25 @@ function buildLimitListEmbed(entries, page, totalPages) {
     .setColor(0x5865f2)
     .setTitle("🎵 Custom Limit List")
     .setDescription(lines.length > 0 ? lines.join("\n\n") : "Tidak ada data.")
+    .setFooter({ text: `Halaman ${page} / ${totalPages} • Total: ${entries.length} entri` })
+    .setTimestamp();
+}
+
+function buildExpiringListEmbed(entries, page, totalPages) {
+  const startIdx = (page - 1) * ENTRIES_PER_PAGE;
+  const slice    = entries.slice(startIdx, startIdx + ENTRIES_PER_PAGE);
+
+  const lines = slice.map((e, i) => {
+    const n     = startIdx + i + 1;
+    const emoji = urgencyEmoji(e.expiresAt);
+    const label = timeRemainingLabel(e.expiresAt);
+    return `${circled(n)} ${e.mention} — ${e.kind}\n${emoji} ${label}`;
+  });
+
+  return new EmbedBuilder()
+    .setColor(0xed4245)
+    .setTitle("⌛ Expired Soon")
+    .setDescription(lines.length > 0 ? lines.join("\n\n") : "Tidak ada yang akan berakhir.")
     .setFooter({ text: `Halaman ${page} / ${totalPages} • Total: ${entries.length} entri` })
     .setTimestamp();
 }
@@ -217,6 +258,17 @@ export async function handleMonitoringInteraction(interaction, client) {
       await interaction.reply({
         embeds:     [buildLimitListEmbed(entries, 1, totalPages)],
         components: [buildNavButtons("l", 1, totalPages)],
+        ephemeral:  true,
+      });
+      return;
+    }
+
+    if (id === "mon:expiring") {
+      const entries    = getExpiringEntries();
+      const totalPages = Math.max(1, Math.ceil(entries.length / ENTRIES_PER_PAGE));
+      await interaction.reply({
+        embeds:     [buildExpiringListEmbed(entries, 1, totalPages)],
+        components: [buildNavButtons("e", 1, totalPages)],
         ephemeral:  true,
       });
       return;
@@ -329,6 +381,58 @@ export async function handleMonitoringInteraction(interaction, client) {
         content:    null,
         embeds:     [buildLimitListEmbed(entries, page, total)],
         components: [buildNavButtons("l", page, total)],
+      });
+      return;
+    }
+
+    // ── Expiring Soon list pagination ────────────────────────────────────
+
+    const epMatch = /^mon:ep:(\d+):(\d+)$/.exec(id);
+    if (epMatch) {
+      const [, cur, tot] = epMatch.map(Number);
+      const page    = Math.max(1, cur - 1);
+      const total   = tot;
+      const entries = getExpiringEntries();
+      await interaction.update({
+        embeds:     [buildExpiringListEmbed(entries, page, total)],
+        components: [buildNavButtons("e", page, total)],
+      });
+      return;
+    }
+
+    const enMatch = /^mon:en:(\d+):(\d+)$/.exec(id);
+    if (enMatch) {
+      const [, cur, tot] = enMatch.map(Number);
+      const page    = Math.min(tot, cur + 1);
+      const total   = tot;
+      const entries = getExpiringEntries();
+      await interaction.update({
+        embeds:     [buildExpiringListEmbed(entries, page, total)],
+        components: [buildNavButtons("e", page, total)],
+      });
+      return;
+    }
+
+    const esMatch = /^mon:es:(\d+)$/.exec(id);
+    if (esMatch) {
+      const total = Number(esMatch[1]);
+      await interaction.update({
+        content:    "📄 Pilih halaman Expired Soon:",
+        embeds:     [],
+        components: [buildSelectRow("e", total)],
+      });
+      return;
+    }
+
+    const egMatch = /^mon:eg:(\d+)$/.exec(id);
+    if (egMatch && interaction.isStringSelectMenu()) {
+      const total   = Number(egMatch[1]);
+      const page    = Number(interaction.values[0]);
+      const entries = getExpiringEntries();
+      await interaction.update({
+        content:    null,
+        embeds:     [buildExpiringListEmbed(entries, page, total)],
+        components: [buildNavButtons("e", page, total)],
       });
       return;
     }

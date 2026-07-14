@@ -1,0 +1,304 @@
+Lakukan UPDATE BESAR pada project Discord Bot ini TANPA menghapus, mengubah, atau merusak fitur yang sudah ada. Seluruh fitur lama WAJIB tetap berjalan seperti sebelumnya. Fokus hanya pada penambahan fitur dan perbaikan berikut.
+
+==================================================
+1. PREMIUM MONITORING (REDESIGN)
+==================================================
+
+Perbarui tampilan Premium Monitoring agar lebih modern dan informatif.
+
+Tampilkan informasi berikut:
+
+👑 Premium Active
+💎 Permanent Premium
+⏳ Temporary Premium
+
+🎵 Custom Limit Active
+💎 Permanent Custom Limit
+⏳ Temporary Custom Limit
+
+👤 Last Premium User
+🎵 Last Custom Limit User
+
+⌛ Next Expired
+📅 Last Update
+🔄 Auto Refresh Status
+
+Gunakan Embed yang lebih rapi.
+
+Tambahkan Button:
+
+👑 Premium
+🎵 Custom Limit
+⌛ Expired Soon
+🔄 Refresh
+
+Semua perubahan WAJIB menggunakan edit message.
+
+Jangan spam membuat pesan baru.
+
+==================================================
+2. BOOMBOX LOGS
+==================================================
+
+Perbaiki sistem BoomBox Logs.
+
+BUG:
+
+Kadang setelah user berhasil membuat BoomBox URL,
+hasilnya tidak masuk ke channel BoomBox Logs.
+
+WAJIB diperbaiki.
+
+Setiap URL yang berhasil dibuat HARUS masuk ke logs.
+
+Hilangkan bagian:
+
+❌ Source : YouTube
+
+Tampilan baru:
+
+🎵 Judul Lagu
+
+⏱ Duration
+
+🔗 BoomBox URL
+
+🕒 Created
+
+━━━━━━━━━━━━━━━━━━
+
+Jangan tampilkan nama user yang membuat.
+
+Jangan mention user.
+
+==================================================
+3. PAGINATION BOOMBOX LOGS
+==================================================
+
+Tambahkan sistem Pagination seperti Ticket Logs.
+
+Button:
+
+⏮ First
+
+◀ Previous
+
+🔄 Refresh
+
+▶ Next
+
+⏭ Last
+
+Dropdown:
+
+📁 BB Page
+
+Contoh:
+
+BB Page 1
+
+BB Page 2
+
+BB Page 3
+
+dst.
+
+Jika halaman penuh
+
+otomatis membuat Page berikutnya.
+
+Gunakan edit message.
+
+Jika Discord sudah hampir mencapai batas edit message,
+
+baru otomatis membuat message baru.
+
+==================================================
+4. PREMIUM EXPIRED LOGS
+==================================================
+
+BUG:
+
+Saat Premium habis
+
+atau Custom Limit habis
+
+kadang tidak masuk ke Premium Logs.
+
+Perbaiki hingga selalu terkirim.
+
+Format:
+
+⚠ Premium Expired
+
+👤 User
+
+👑 Premium
+
+📅 Expired At
+
+━━━━━━━━━━━━━━
+
+atau
+
+⚠ Custom Limit Expired
+
+👤 User
+
+🎵 Limit
+
+📅 Expired At
+
+==================================================
+5. HELP COMMAND
+==================================================
+
+Perbarui command
+
+/help
+
+Tambahkan seluruh command yang sudah ada.
+
+Contoh:
+
+🎫 Ticket
+
+/cticket
+/delcticket
+
+🐞 Report
+
+/cbug
+/delcbug
+
+🎵 BoomBox
+
+/boombox
+/setlimit
+/setpremiumlimit
+
+👑 Premium
+
+/addpremium
+/removepremium
+
+📊 Monitoring
+
+/panelstats
+
+dan seluruh command lainnya.
+
+Setiap command memiliki deskripsi singkat.
+
+Contoh:
+
+/cticket
+
+Membuat Panel Open Ticket.
+
+/delcticket
+
+Menghapus seluruh Panel Ticket beserta Dashboard Ticket.
+
+/cbug
+
+Membuat Panel Report Bug & Feature.
+
+/delcbug
+
+Menghapus Panel Report Bug & Feature.
+
+==================================================
+6. DELCTICKET
+==================================================
+
+Tambahkan command baru
+
+/delcticket
+
+Owner Only.
+
+Saat dijalankan:
+
+✔ Menghapus Panel Ticket.
+
+✔ Menghapus Dashboard Ticket Logs.
+
+✔ Menghapus seluruh Button.
+
+✔ Menghapus Message ID.
+
+✔ Menghapus konfigurasi Ticket.
+
+✔ Membersihkan konfigurasi database Ticket.
+
+Bot mengirim:
+
+✅ Ticket System berhasil dihapus.
+
+==================================================
+7. DELCBUG
+==================================================
+
+Tambahkan command
+
+/delcbug
+
+Owner Only.
+
+Saat dijalankan:
+
+✔ Menghapus Panel Report.
+
+✔ Menghapus seluruh Button.
+
+✔ Menghapus Message ID.
+
+✔ Menghapus konfigurasi Bug Report.
+
+✔ Membersihkan database konfigurasi.
+
+Bot mengirim:
+
+✅ Report Center berhasil dihapus.
+
+==================================================
+8. PERTAHANKAN FITUR LAMA
+==================================================
+
+DILARANG mengubah atau menghapus fitur yang sudah ada.
+
+Seluruh sistem berikut WAJIB tetap berjalan:
+
+• AI
+• Scanner
+• Admin Panel
+• BoomBox
+• Premium
+• Ticket
+• Report Center
+• Database
+• Role Panel
+• Welcome
+• Logs
+• Command lama
+
+Hanya lakukan penambahan dan perbaikan yang disebutkan di atas.
+
+==================================================
+9. KUALITAS KODE
+==================================================
+
+Pastikan:
+
+• Tidak ada error.
+• Tidak ada duplicate event.
+• Tidak ada duplicate collector.
+• Tidak ada duplicate message.
+• Tidak ada memory leak.
+• Tidak ada spam message.
+• Semua dashboard menggunakan edit message semaksimal mungkin.
+• Seluruh Button dan Dropdown tetap aktif setelah bot restart.
+• Seluruh konfigurasi tersimpan di database.
+
+Output harus berupa project yang sudah siap dijalankan tanpa merusak fitur lama.

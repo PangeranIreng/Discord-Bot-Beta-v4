@@ -107,6 +107,14 @@ export class TicketDB {
   getAllTickets() {
     return [...this._data.tickets];
   }
+
+  /** Wipe panel/dashboard/message IDs and mention role — used by /delcticket.
+   * Deliberately leaves `tickets`/`counter` untouched (ticket history is not
+   * "config" and the spec only asks to remove the panel/dashboard/config). */
+  resetConfig() {
+    this._data.config = structuredClone(DEFAULT_DB.config);
+    this._save();
+  }
 }
 
 export const ticketDB = new TicketDB();

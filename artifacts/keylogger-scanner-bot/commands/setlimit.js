@@ -81,6 +81,7 @@ export async function execute(interaction) {
   } else {
     premDB.setCustomLimitUser(target.id, record);
   }
+  premDB.setLastCustomLimitTarget(`${target}`);
 
   const embed = new EmbedBuilder()
     .setColor(0x5865f2)

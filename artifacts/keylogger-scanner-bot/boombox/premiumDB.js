@@ -27,6 +27,11 @@ const DEFAULT_DB = {
   customLimitUsers: {},
   customLimitRoles: {},
   dashboard:        { messageId: null, entryIndex: 0 },
+  // Last target touched by /addprem and /setlimit respectively — shown on
+  // the Premium Monitoring dashboard ("Last Premium User" / "Last Custom
+  // Limit User"). Mention strings (e.g. "<@id>" or "<@&id>"), or null.
+  lastPremiumTarget:     null,
+  lastCustomLimitTarget: null,
 };
 
 export class PremiumDB {
@@ -135,6 +140,12 @@ export class PremiumDB {
     return r;
   }
 
+  /** Same as getCustomLimitUser but does NOT hide already-expired records —
+   * used by the sweep to log an expiry's details before deleting it. */
+  getRawCustomLimitUser(userId) {
+    return this._data.customLimitUsers[userId] ?? null;
+  }
+
   setCustomLimitUser(userId, record) {
     this._data.customLimitUsers[userId] = record;
     this._save();
@@ -163,6 +174,12 @@ export class PremiumDB {
     if (!r) return null;
     if (r.expiresAt && new Date(r.expiresAt) <= new Date()) return null;
     return r;
+  }
+
+  /** Same as getCustomLimitRole but does NOT hide already-expired records —
+   * used by the sweep to log an expiry's details before deleting it. */
+  getRawCustomLimitRole(roleId) {
+    return this._data.customLimitRoles[roleId] ?? null;
   }
 
   setCustomLimitRole(roleId, record) {
@@ -210,6 +227,28 @@ export class PremiumDB {
    */
   setDashboardState(patch) {
     this._data.dashboard = { ...this._data.dashboard, ...patch };
+    this._save();
+  }
+
+  // ── Last touched target (for the Monitoring dashboard) ───────────────────
+
+  getLastPremiumTarget() {
+    return this._data.lastPremiumTarget ?? null;
+  }
+
+  /** @param {string} mention e.g. "<@userId>" or "<@&roleId>" */
+  setLastPremiumTarget(mention) {
+    this._data.lastPremiumTarget = mention;
+    this._save();
+  }
+
+  getLastCustomLimitTarget() {
+    return this._data.lastCustomLimitTarget ?? null;
+  }
+
+  /** @param {string} mention e.g. "<@userId>" or "<@&roleId>" */
+  setLastCustomLimitTarget(mention) {
+    this._data.lastCustomLimitTarget = mention;
     this._save();
   }
 }

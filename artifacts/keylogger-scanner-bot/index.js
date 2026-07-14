@@ -8,6 +8,7 @@ import { handleScanButtonInteraction } from "./scanner/interactionHandler.js";
 import { startSetupServer } from "./config/setupServer.js";
 import { handleBoomBoxMessage }    from "./boombox/boomboxHandler.js";
 import { handleBoomBoxInteraction } from "./boombox/boomboxInteraction.js";
+import { handleBoomBoxLogInteraction } from "./boombox/boomboxLogInteraction.js";
 import { loadCommands } from "./commands/index.js";
 import { deployCommands } from "./commands/deploy.js";
 import { IDS } from "./config/ids.js";
@@ -218,6 +219,8 @@ function startBot(secrets) {
         await handleBugReportInteraction(interaction);
       } else if (isBtn && id.startsWith("bm:")) {
         await handleBoomBoxInteraction(interaction);
+      } else if (id.startsWith("bblog:")) {
+        await handleBoomBoxLogInteraction(interaction);
       } else if (isBtn && id.startsWith("sk:")) {
         await handleScanButtonInteraction(interaction);
       }

@@ -18,6 +18,16 @@ import { logger } from "../utils/logger.js";
 
 // ── Stats calculation ──────────────────────────────────────────────────────
 
+/** Nearest upcoming expiry across all active temporary grants, or null. */
+function nextExpiredLabel(allPrem, allLim) {
+  const candidates = [...allPrem, ...allLim].filter(r => r.expiresAt);
+  if (candidates.length === 0) return "Tidak ada";
+  const soonest = candidates.reduce((a, b) =>
+    new Date(a.expiresAt) < new Date(b.expiresAt) ? a : b
+  );
+  return `<t:${Math.floor(new Date(soonest.expiresAt).getTime() / 1000)}:R>`;
+}
+
 function calcStats() {
   const now = new Date();
 
@@ -49,6 +59,9 @@ function calcStats() {
     temporaryPremium:     allPrem.filter(r => r.type === "temporary").length,
     permanentCustomLimit: allLim.filter(r => r.type  === "permanent").length,
     temporaryCustomLimit: allLim.filter(r => r.type  === "temporary").length,
+    lastPremiumUser:      premDB.getLastPremiumTarget() ?? "Belum ada",
+    lastCustomLimitUser:  premDB.getLastCustomLimitTarget() ?? "Belum ada",
+    nextExpired:          nextExpiredLabel(allPrem, allLim),
   };
 }
 
@@ -60,16 +73,23 @@ function buildDashboardEmbed(stats) {
   return new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle("👑 Premium Monitoring")
+    .setDescription("Status Premium & Custom Limit BoomBox, diperbarui secara live.")
     .addFields(
-      { name: "🔄 Last Update",          value: `<t:${nowUnix}:f>`,          inline: false },
-      { name: "👑 Premium Active",        value: `${stats.premiumActive}`,     inline: true  },
-      { name: "🎵 Custom Limit Active",   value: `${stats.customLimitActive}`, inline: true  },
-      { name: "\u200B",                   value: "\u200B",                     inline: true  },
-      { name: "💎 Permanent Premium",     value: `${stats.permanentPremium}`,  inline: true  },
-      { name: "⏳ Temporary Premium",     value: `${stats.temporaryPremium}`,  inline: true  },
-      { name: "\u200B",                   value: "\u200B",                     inline: true  },
-      { name: "💎 Permanent Custom Limit",value: `${stats.permanentCustomLimit}`, inline: true },
-      { name: "⏳ Temporary Custom Limit",value: `${stats.temporaryCustomLimit}`, inline: true },
+      { name: "👑 Premium Active",         value: `${stats.premiumActive}`,         inline: true  },
+      { name: "🎵 Custom Limit Active",    value: `${stats.customLimitActive}`,     inline: true  },
+      { name: "\u200B",                    value: "\u200B",                         inline: true  },
+      { name: "💎 Permanent Premium",      value: `${stats.permanentPremium}`,      inline: true  },
+      { name: "⏳ Temporary Premium",      value: `${stats.temporaryPremium}`,      inline: true  },
+      { name: "\u200B",                    value: "\u200B",                         inline: true  },
+      { name: "💎 Permanent Custom Limit", value: `${stats.permanentCustomLimit}`,  inline: true  },
+      { name: "⏳ Temporary Custom Limit", value: `${stats.temporaryCustomLimit}`,  inline: true  },
+      { name: "\u200B",                    value: "\u200B",                         inline: true  },
+      { name: "👤 Last Premium User",      value: stats.lastPremiumUser,            inline: true  },
+      { name: "🎵 Last Custom Limit User", value: stats.lastCustomLimitUser,        inline: true  },
+      { name: "\u200B",                    value: "\u200B",                         inline: true  },
+      { name: "⌛ Next Expired",           value: stats.nextExpired,                inline: true  },
+      { name: "📅 Last Update",            value: `<t:${nowUnix}:f>`,              inline: true  },
+      { name: "🔄 Auto Refresh Status",    value: "✅ Aktif (live update)",         inline: true  },
     )
     .setFooter({ text: "Auto-refreshes on every change • Premium Monitoring" })
     .setTimestamp();
@@ -87,6 +107,11 @@ function buildDashboardButtons() {
       .setLabel("Custom Limit")
       .setEmoji("🎵")
       .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId("mon:expiring")
+      .setLabel("Expired Soon")
+      .setEmoji("⌛")
+      .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
       .setCustomId("mon:refresh")
       .setLabel("Refresh")

@@ -72,16 +72,34 @@ function buildLogEmbed(entry) {
         .setTimestamp();
     }
 
-    // ── ⌛ Premium Berakhir ────────────────────────────────────────────────
+    // ── ⚠ Premium Expired ─────────────────────────────────────────────────
     case "Premium Expired": {
+      const expUnix = entry.expiredAt
+        ? Math.floor(new Date(entry.expiredAt).getTime() / 1000)
+        : nowUnix;
       return new EmbedBuilder()
         .setColor(0xfee75c)
-        .setTitle("⌛ Premium Berakhir")
+        .setTitle("⚠ Premium Expired")
         .addFields(
-          { name: "Member",   value: entry.target,        inline: true },
-          { name: "Expired",  value: `<t:${nowUnix}:f>`, inline: true },
-          { name: "Diproses", value: "System",            inline: true },
-          { name: "Status",   value: "✅ Expired",        inline: true },
+          { name: "👤 User",      value: entry.target,          inline: true },
+          { name: "👑 Premium",   value: entry.premiumLabel ?? "Temporary", inline: true },
+          { name: "📅 Expired At",value: `<t:${expUnix}:f>`,    inline: true },
+        )
+        .setTimestamp();
+    }
+
+    // ── ⚠ Custom Limit Expired ───────────────────────────────────────────
+    case "Custom Limit Expired": {
+      const expUnix = entry.expiredAt
+        ? Math.floor(new Date(entry.expiredAt).getTime() / 1000)
+        : nowUnix;
+      return new EmbedBuilder()
+        .setColor(0xfee75c)
+        .setTitle("⚠ Custom Limit Expired")
+        .addFields(
+          { name: "👤 User",       value: entry.target,                    inline: true },
+          { name: "🎵 Limit",      value: entry.limit != null ? `${entry.limit} Request/Hari` : "—", inline: true },
+          { name: "📅 Expired At", value: `<t:${expUnix}:f>`,              inline: true },
         )
         .setTimestamp();
     }
