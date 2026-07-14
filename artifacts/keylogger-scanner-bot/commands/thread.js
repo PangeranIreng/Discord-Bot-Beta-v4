@@ -55,7 +55,7 @@ export async function execute(interaction) {
     const channel = interaction.options.getChannel("channel", true);
     threadDB.enable(channel.id, interaction.guildId);
     await interaction.reply({
-      content: `✅ Auto Thread diaktifkan di ${channel}.\nSetiap posting baru akan otomatis dibuat thread bernama **💬 Chat Disini**.`,
+      content: `✅ Auto Thread diaktifkan di ${channel}.\nSetiap posting baru akan otomatis dibuat thread bernama **Chat Disini**.`,
       ephemeral: true,
     });
     return;

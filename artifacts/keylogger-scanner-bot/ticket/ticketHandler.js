@@ -25,6 +25,7 @@ import {
   buildTicketStatusEmbed,
   buildControlEmbed,
   buildControlButtons,
+  buildClaimPanelButtons,
 } from "./ticketEmbed.js";
 import { padTicketNumber } from "./ticketUtils.js";
 import { updateTicketDashboard } from "./ticketDashboard.js";
@@ -149,8 +150,7 @@ export async function openTicket(interaction) {
 
       const controlMsg = await staffChannel.send({
         content:    notifContent,
-        embeds:     [buildControlEmbed(number, "open", interaction.user.id, null)],
-        components: buildControlButtons("open", number),
+        components: buildClaimPanelButtons(number),
       });
       ticketDB.updateTicket(thread.id, { controlMessageId: controlMsg.id });
     } catch (e) {

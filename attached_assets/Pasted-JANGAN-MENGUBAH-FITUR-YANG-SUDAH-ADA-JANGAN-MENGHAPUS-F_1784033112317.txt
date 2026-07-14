@@ -1,0 +1,362 @@
+JANGAN MENGUBAH FITUR YANG SUDAH ADA.
+
+JANGAN MENGHAPUS FILE.
+
+JANGAN MENGUBAH UI.
+
+JANGAN MENGUBAH DATABASE.
+
+JANGAN MENGUBAH EMBED.
+
+JANGAN MENGUBAH COMMAND YANG SUDAH BERJALAN.
+
+Semua fitur lama WAJIB tetap berfungsi.
+
+====================================================
+1. PERBAIKI SLASH COMMAND YANG TIDAK MUNCUL
+====================================================
+
+Saat ini command baru tidak muncul ketika mengetik "/".
+
+Pastikan seluruh slash command berikut benar-benar diregister ulang.
+
+Command yang WAJIB muncul:
+
+/setclaimticket
+/cc
+/thread
+/thread list
+
+Jika command sudah dibuat tetapi tidak muncul, perbaiki proses registrasi slash command hingga muncul di Discord.
+
+====================================================
+2. CLAIM TICKET PANEL
+====================================================
+
+Tambahkan command baru:
+
+/setclaimticket <channel> <role>
+
+Contoh:
+
+/setclaimticket #claim-ticket @Owner
+
+Fungsi:
+
+- Menyimpan channel Claim Ticket.
+- Menyimpan role yang akan di-tag.
+- Simpan ke database.
+- Tidak mengubah /cticket.
+- Tidak mengubah /setlogticket.
+
+Saat user membuat ticket:
+
+• Ticket tetap dibuat seperti sekarang.
+• Ticket Logs tetap berjalan.
+• Setelah itu bot mengirim panel ke channel Claim Ticket.
+
+Isi panel:
+
+Ada yang buka tiket nih cuy, segera respon.
+
+Mention role yang sudah disimpan.
+
+Tanpa judul embed.
+
+Button:
+
+✅ Claim Ticket
+🔒 Lock Ticket
+🗑 Delete Ticket
+📄 Transcript
+
+Button hanya muncul di channel Claim Ticket.
+
+Button TIDAK muncul di ticket user.
+
+Button hanya bisa dipakai:
+
+• Owner ID
+• Developer ID
+
+====================================================
+3. CLEAR CHAT
+====================================================
+
+Command:
+
+/cc <jumlah>
+
+Contoh:
+
+/cc 50
+
+/cc 99
+
+Fungsi:
+
+Menghapus chat sesuai jumlah.
+
+Hanya bisa digunakan oleh:
+
+• Owner ID
+• Developer ID
+
+Bukan berdasarkan role.
+
+====================================================
+4. AUTO THREAD
+====================================================
+
+Command:
+
+/thread <channel> <on/off>
+
+Contoh:
+
+/thread #galeri on
+
+/thread #media off
+
+Jika ON:
+
+Setiap ada pesan baru di channel tersebut:
+
+Bot otomatis membuat Thread.
+
+Nama Thread:
+
+Chat Disini
+
+Tanpa mention user.
+
+Tanpa username.
+
+Tanpa timestamp.
+
+====================================================
+5. THREAD LIST
+====================================================
+
+Tambahkan:
+
+/thread list
+
+Menampilkan seluruh channel Auto Thread.
+
+Contoh:
+
+🟢 #galeri
+
+🟢 #media
+
+🔴 #foto
+
+Hijau = ON
+
+Merah = OFF
+
+====================================================
+6. /HELP
+====================================================
+
+JANGAN UBAH TAMPILAN /HELP.
+
+JANGAN UBAH KATEGORI LAMA.
+
+CUKUP TAMBAHKAN COMMAND BARU.
+
+Kategori Ticket:
+
++ /setclaimticket
+
+Kategori Thread (baru):
+
+/thread
+/thread list
+
+Kategori Admin:
+
++ /cc
+
+====================================================
+7. BOOMBOX LOGS
+====================================================
+
+BoomBox Logs hanya menampilkan:
+
+🎵 Judul Lagu
+
+🔗 URL BoomBox
+
+🕒 Waktu
+
+JANGAN tampilkan:
+
+❌ Nama user
+
+❌ Mention user
+
+❌ Link YouTube
+
+Jika convert gagal:
+
+Kirim ke Error Logs.
+
+Bukan BoomBox Logs.
+
+====================================================
+8. PAGINATION BOOMBOX LOGS
+====================================================
+
+Perbaiki bug pagination.
+
+Saat ini:
+
+Total Log = 13
+
+Tetapi footer:
+
+Halaman 1/1
+
+Itu salah.
+
+Gunakan:
+
+totalPages = Math.ceil(totalLogs / 10)
+
+Contoh:
+
+1-10 Log
+
+Halaman 1/1
+
+11-20 Log
+
+Halaman 1/2
+
+21-30 Log
+
+Halaman 1/3
+
+31-40 Log
+
+Halaman 1/4
+
+Setiap halaman maksimal:
+
+10 Log.
+
+Footer:
+
+BoomBox Logs
+
+Halaman X/Y
+
+Total XX Entri
+
+====================================================
+9. BUTTON PAGINATION
+====================================================
+
+Button:
+
+⏮ First
+
+◀ Previous
+
+🔄 Refresh
+
+▶ Next
+
+⏭ Last
+
+📂 View All Pages
+
+Semua button wajib berfungsi.
+
+First → halaman pertama.
+
+Previous → halaman sebelumnya.
+
+Next → halaman berikutnya.
+
+Last → halaman terakhir.
+
+Refresh → reload data terbaru.
+
+View All Pages →
+
+Menampilkan daftar halaman:
+
+📄 Halaman 1
+
+📄 Halaman 2
+
+📄 Halaman 3
+
+dst.
+
+====================================================
+10. SISTEM LOG
+====================================================
+
+BoomBox Logs hanya menggunakan SATU MESSAGE.
+
+Jangan spam embed baru.
+
+Selalu gunakan edit message.
+
+Message lama diedit.
+
+Jika sudah lebih dari 10 log:
+
+Buat halaman berikutnya.
+
+Bukan membuat pesan baru.
+
+====================================================
+11. YANG TIDAK BOLEH DIUBAH
+====================================================
+
+❌ BoomBox Converter
+
+❌ Ticket
+
+❌ Scanner
+
+❌ CPanel
+
+❌ Premium
+
+❌ Limit
+
+❌ Database
+
+❌ UI
+
+❌ Embed
+
+❌ Warna
+
+❌ Desain
+
+❌ Command lama
+
+====================================================
+12. SEBELUM SELESAI
+====================================================
+
+Pastikan:
+
+✅ Semua command baru muncul saat mengetik "/".
+
+✅ Tidak ada error compile.
+
+✅ Tidak ada error database.
+
+✅ Semua fitur lama tetap berjalan.
+
+✅ Semua fitur baru bekerja 100%.
+
+Jangan tandai pekerjaan selesai sebelum semua command benar-benar muncul dan bisa digunakan di Discord.

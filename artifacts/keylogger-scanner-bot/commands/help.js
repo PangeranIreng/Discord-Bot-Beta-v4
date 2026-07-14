@@ -176,6 +176,12 @@ const USAGE = {
   },
 
   // ⚙️ Admin
+  cc: {
+    category: "admin",
+    emoji: "🗑️",
+    summary: "Hapus pesan terakhir di channel ini sesuai jumlah yang ditentukan. Owner/Developer only.",
+    examples: ["`/cc 50` → Hapus 50 pesan", "`/cc 99` → Hapus 99 pesan"],
+  },
   deploy: {
     category: "admin",
     emoji: "🚀",

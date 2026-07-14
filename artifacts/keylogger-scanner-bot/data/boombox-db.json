@@ -6,9 +6,9 @@
     "2026-07-13": {}
   },
   "statistics": {
-    "total": 25,
+    "total": 30,
     "byPlatform": {
-      "YouTube": 25
+      "YouTube": 30
     }
   },
   "history": [
@@ -250,11 +250,91 @@
       "duration": 783,
       "limitRemaining": "Unlimited",
       "timestamp": "2026-07-14T09:28:43.687Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "AJENG FEBRIA - EMANG DASAR (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | EMANG DASAR KAMU BAJI***N",
+      "originalUrl": "https://youtu.be/W0-uo0CnIJA?si=zFVm5qKwmlGecmXW",
+      "boomboxUrl": "https://d.top4top.io/m_3847s83ex0.mp3",
+      "duration": 343,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T12:40:28.266Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "AJENG FEBRIA - YANK - WALI BAND (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | SAYANG KU MAU BICARA",
+      "originalUrl": "https://youtu.be/gQZJNvebfkA?si=N8Xq4B6RwkoUaM7Q",
+      "boomboxUrl": "https://d.top4top.io/m_3847b642l0.mp3",
+      "duration": 314,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T12:49:13.357Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "NGAMEN 5 - AJENG FEBRIA | NEW ASTINA MUSIC (OFFICIAL LIVE MUSIC)",
+      "originalUrl": "https://youtu.be/z33PpOHsF-Q?si=lEaicLPw9JpJ1ihy",
+      "boomboxUrl": "https://f.top4top.io/m_3847wc8sz0.mp3",
+      "duration": 310,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T12:49:24.089Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Ajeng Febria - Negoro Angin | Sagita Djandhut Assololley | Dangdut (Official Music Video)",
+      "originalUrl": "https://youtu.be/Bt_NcCkodfs?si=CxK5Pglj_4w4m_XM",
+      "boomboxUrl": "https://h.top4top.io/m_38470o4jf0.mp3",
+      "duration": 527,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T12:49:41.721Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "AJENG FEBRIA - KARI CERITO (Official Music Live) Kadung riko kepingin ngadoh",
+      "originalUrl": "https://youtu.be/i37q8cPpTf0?si=52t3JgH1-DYKFzSJ",
+      "boomboxUrl": "https://i.top4top.io/m_3847lci840.mp3",
+      "duration": 341,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T12:50:00.455Z"
     }
   ],
   "logState": {
     "messageId": "1526256015941832776",
     "entries": [
+      {
+        "title": "AJENG FEBRIA - KARI CERITO (Official Music Live) Kadung riko kepingin ngadoh",
+        "duration": 341,
+        "boomboxUrl": "https://i.top4top.io/m_3847lci840.mp3",
+        "timestamp": "2026-07-14T12:50:00.455Z"
+      },
+      {
+        "title": "Ajeng Febria - Negoro Angin | Sagita Djandhut Assololley | Dangdut (Official Music Video)",
+        "duration": 527,
+        "boomboxUrl": "https://h.top4top.io/m_38470o4jf0.mp3",
+        "timestamp": "2026-07-14T12:49:41.721Z"
+      },
+      {
+        "title": "NGAMEN 5 - AJENG FEBRIA | NEW ASTINA MUSIC (OFFICIAL LIVE MUSIC)",
+        "duration": 310,
+        "boomboxUrl": "https://f.top4top.io/m_3847wc8sz0.mp3",
+        "timestamp": "2026-07-14T12:49:24.089Z"
+      },
+      {
+        "title": "AJENG FEBRIA - YANK - WALI BAND (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | SAYANG KU MAU BICARA",
+        "duration": 314,
+        "boomboxUrl": "https://d.top4top.io/m_3847b642l0.mp3",
+        "timestamp": "2026-07-14T12:49:13.357Z"
+      },
+      {
+        "title": "AJENG FEBRIA - EMANG DASAR (OFFICIAL MUSIC VIDEO ANEKA SAFARI) | EMANG DASAR KAMU BAJI***N",
+        "duration": 343,
+        "boomboxUrl": "https://d.top4top.io/m_3847s83ex0.mp3",
+        "timestamp": "2026-07-14T12:40:28.266Z"
+      },
       {
         "title": "DJ KAULAH SELURUH CINTA BAGIKU | DJ SELURUH CINTA SOUND JJ VIRAL TIKTOK YANG KALIAN CARI CARI!!!",
         "duration": 783,

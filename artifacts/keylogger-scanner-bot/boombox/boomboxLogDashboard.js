@@ -2,8 +2,9 @@
  * boomboxLogDashboard.js — Paginated BoomBox Logs dashboard.
  *
  * Single message, edited in place. 10 entries per page.
- * Navigation: ◀ Previous | 📚 Semua Halaman | Next ▶
- * Each entry shows only: numbered index, 🎵 Title, 🔗 URL.
+ * Navigation row 1: ⏮ First | ◀ Previous | 🔄 Refresh | ▶ Next | ⏭ Last
+ * Navigation row 2: 📂 View All Pages
+ * Each entry: numbered index, 🎵 Title, 🔗 URL, 🕒 Waktu.
  */
 
 import {
@@ -18,6 +19,19 @@ import { BOOMBOX_CONFIG }  from "./boomboxConfig.js";
 import { db }              from "./db.js";
 import { LOG_SEP }         from "./boomboxEmbed.js";
 import { logger }          from "../utils/logger.js";
+
+/** Format an ISO timestamp to WIB (UTC+7) display string. */
+function formatWIB(iso) {
+  if (!iso) return "-";
+  try {
+    const d = new Date(iso);
+    const wib = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${pad(wib.getUTCDate())}/${pad(wib.getUTCMonth() + 1)}/${wib.getUTCFullYear()} ${pad(wib.getUTCHours())}:${pad(wib.getUTCMinutes())} WIB`;
+  } catch {
+    return "-";
+  }
+}
 
 const COLOR_LOG        = 0x3ba4ff;
 const PAGE_SIZE        = 10;
@@ -48,7 +62,7 @@ function buildPageDescription(slice, pageStartIndex) {
     const n     = pageStartIndex + i;
     // Truncate title at 60 chars to keep description manageable
     const title = (entry.title ?? "Unknown").slice(0, 60);
-    blocks.push(`**${n}.**\n🎵 ${title}\n🔗 ${entry.boomboxUrl ?? "-"}`);
+    blocks.push(`**${n}.**\n🎵 ${title}\n🔗 ${entry.boomboxUrl ?? "-"}\n🕒 ${formatWIB(entry.timestamp)}`);
   }
 
   let desc = `${LOG_SEP}\n\n${blocks.join(`\n\n${LOG_SEP}\n\n`)}\n\n${LOG_SEP}`;
@@ -71,39 +85,66 @@ export function buildLogDashboardEmbed(entries, requestedPage = 1) {
     .setTitle("📻 BoomBox Logs")
     .setDescription(buildPageDescription(slice, pageStartIndex))
     .setFooter({
-      text: `━━━━━━━━━━\n📄 Halaman ${page}/${totalPages}\nPangeran Assistant AI • BoomBox Logs • Total: ${entries.length} entri`,
+      text: `BoomBox Logs\nHalaman ${page}/${totalPages}\nTotal ${entries.length} Entri`,
     })
     .setTimestamp();
 }
 
-// ── Navigation: ◀ Previous | 📚 Semua Halaman | Next ▶ ──────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
+// Row 1: ⏮ First | ◀ Previous | 🔄 Refresh | ▶ Next | ⏭ Last
+// Row 2: 📂 View All Pages
 
-function buildNavRow(page, totalPages) {
-  return new ActionRowBuilder().addComponents(
+function buildNavRows(page, totalPages) {
+  const isFirst = page <= 1;
+  const isLast  = page >= totalPages;
+
+  const row1 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`bblog:nav:first:${page}`)
+      .setEmoji("⏮️")
+      .setLabel("First")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(isFirst),
     new ButtonBuilder()
       .setCustomId(`bblog:nav:prev:${page}`)
       .setEmoji("◀️")
       .setLabel("Previous")
       .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page <= 1),
+      .setDisabled(isFirst),
     new ButtonBuilder()
-      .setCustomId(`bblog:viewall:${page}`)
-      .setEmoji("📚")
-      .setLabel("Semua Halaman")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(totalPages <= 1),
+      .setCustomId(`bblog:nav:refresh:${page}`)
+      .setEmoji("🔄")
+      .setLabel("Refresh")
+      .setStyle(ButtonStyle.Secondary),
     new ButtonBuilder()
       .setCustomId(`bblog:nav:next:${page}`)
       .setEmoji("▶️")
       .setLabel("Next")
       .setStyle(ButtonStyle.Secondary)
-      .setDisabled(page >= totalPages),
+      .setDisabled(isLast),
+    new ButtonBuilder()
+      .setCustomId(`bblog:nav:last:${page}`)
+      .setEmoji("⏭️")
+      .setLabel("Last")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(isLast),
   );
+
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`bblog:viewall:${page}`)
+      .setEmoji("📂")
+      .setLabel("View All Pages")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(totalPages <= 1),
+  );
+
+  return [row1, row2];
 }
 
 export function buildLogDashboardComponents(entries, requestedPage = 1) {
   const { totalPages, page } = resolvePage(entries, requestedPage);
-  return [buildNavRow(page, totalPages)];
+  return buildNavRows(page, totalPages);
 }
 
 // ── "Semua Halaman" ephemeral — shows page list so user can jump directly ─────

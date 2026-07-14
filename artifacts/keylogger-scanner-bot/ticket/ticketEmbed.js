@@ -181,3 +181,39 @@ export function buildControlButtons(status, ticketNumber) {
     new ActionRowBuilder().addComponents(transcriptBtn),
   ];
 }
+
+/**
+ * Builds the 4-button row for the Staff Control (claim) channel panel.
+ * All 4 buttons are ALWAYS shown — regardless of ticket status.
+ * These customIds reuse the existing ticket interaction handler routes.
+ *
+ * ✅ Claim Ticket  🔒 Lock Ticket  🗑 Delete Ticket  📄 Transcript
+ *
+ * @param {number} ticketNumber
+ */
+export function buildClaimPanelButtons(ticketNumber) {
+  return [
+    new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`ticket:claim:${ticketNumber}`)
+        .setLabel("Claim Ticket")
+        .setEmoji("✅")
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(`ticket:close:${ticketNumber}`)
+        .setLabel("Lock Ticket")
+        .setEmoji("🔒")
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId(`ticket:delete:${ticketNumber}`)
+        .setLabel("Delete Ticket")
+        .setEmoji("🗑️")
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId(`ticket:transcript:${ticketNumber}`)
+        .setLabel("Transcript")
+        .setEmoji("📄")
+        .setStyle(ButtonStyle.Secondary),
+    ),
+  ];
+}
