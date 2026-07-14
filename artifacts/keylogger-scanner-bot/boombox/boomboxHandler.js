@@ -22,6 +22,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
 } from "discord.js";
 
 import { BOOMBOX_CONFIG, ALLOWED_ROLES, UNLIMITED_ROLES } from "./boomboxConfig.js";
@@ -394,11 +395,34 @@ export async function handleBoomBoxMessage(message) {
     const usage = db.getUsage(message.author.id);
     logger.info(`[BoomBox] Usage today: ${usage}/${limit} for user ${message.author.id}`);
     if (usage >= limit) {
-      await message.channel.send(
-        `${userMention} ❌ Kamu telah mencapai batas harian BoomBox Free (**${limit}x/hari**).\n\n` +
-        "🔄 Limit akan otomatis reset keesokan harinya.\n" +
-        "⭐ Upgrade ke **Premium** untuk akses tak terbatas."
-      ).catch(() => {});
+      const limitEmbed = new EmbedBuilder()
+        .setColor(0xed4245)
+        .setTitle("❌ BoomBox Limit")
+        .setDescription(
+          "━━━━━━━━━━━━━━━━━━\n\n" +
+          "Kamu telah mencapai batas penggunaan hari ini.\n\n" +
+          `📊 **Sisa Limit**\n0\n\n` +
+          "🔄 **Reset**\nBesok\n\n" +
+          "⭐ Upgrade ke **Premium** untuk mendapatkan akses BoomBox tanpa batas harian.\n\n" +
+          "━━━━━━━━━━━━━━━━━━"
+        );
+
+      // Try DM first — truly private. Fall back to a channel reply that
+      // auto-deletes after 10 s so other users don't see the limit notice.
+      let dmSent = false;
+      try {
+        await message.author.send({ embeds: [limitEmbed] });
+        dmSent = true;
+      } catch {
+        // DMs disabled — fall through to channel fallback
+      }
+
+      if (!dmSent) {
+        message.reply({ embeds: [limitEmbed] })
+          .then((reply) => setTimeout(() => reply.delete().catch(() => {}), 10_000))
+          .catch(() => {});
+      }
+
       processingSet.delete(message.id);
       return;
     }

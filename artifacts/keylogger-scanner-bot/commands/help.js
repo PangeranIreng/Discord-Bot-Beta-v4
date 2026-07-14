@@ -176,6 +176,12 @@ const USAGE = {
   },
 
   // ⚙️ Admin
+  premstats: {
+    category: "admin",
+    emoji: "👑",
+    summary: "Buat panel Premium Statistics di channel yang dipilih. Owner/Developer only.",
+    examples: ["`/premstats channel:#premium-stats` → Buat panel di channel tersebut"],
+  },
   cc: {
     category: "admin",
     emoji: "🗑️",

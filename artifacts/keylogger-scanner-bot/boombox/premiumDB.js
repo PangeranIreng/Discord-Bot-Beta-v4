@@ -27,6 +27,10 @@ const DEFAULT_DB = {
   customLimitUsers: {},
   customLimitRoles: {},
   dashboard:        { messageId: null, entryIndex: 0 },
+  // Premium Statistics dashboard (new /premstats panel).
+  // channelId: the channel chosen by /premstats
+  // messageId: the single panel message, always edited in-place
+  premStatsDashboard: { channelId: null, messageId: null },
   // Last target touched by /addprem and /setlimit respectively — shown on
   // the Premium Monitoring dashboard ("Last Premium User" / "Last Custom
   // Limit User"). Mention strings (e.g. "<@id>" or "<@&id>"), or null.
@@ -52,7 +56,8 @@ export class PremiumDB {
       return {
         ...structuredClone(DEFAULT_DB),
         ...parsed,
-        dashboard: { ...structuredClone(DEFAULT_DB.dashboard), ...(parsed.dashboard ?? {}) },
+        dashboard:          { ...structuredClone(DEFAULT_DB.dashboard),          ...(parsed.dashboard          ?? {}) },
+        premStatsDashboard: { ...structuredClone(DEFAULT_DB.premStatsDashboard), ...(parsed.premStatsDashboard ?? {}) },
       };
     } catch {
       return structuredClone(DEFAULT_DB);
@@ -201,6 +206,23 @@ export class PremiumDB {
     return Object.entries(this._data.customLimitRoles)
       .filter(([, r]) => r.expiresAt && new Date(r.expiresAt) <= now)
       .map(([roleId]) => roleId);
+  }
+
+  // ── Premium Stats Dashboard (new /premstats panel) ───────────────────────
+
+  /**
+   * @returns {{ channelId: string|null, messageId: string|null }}
+   */
+  getPremStatsDashboardState() {
+    return { channelId: null, messageId: null, ...this._data.premStatsDashboard };
+  }
+
+  /**
+   * @param {{ channelId?: string|null, messageId?: string|null }} patch
+   */
+  setPremStatsDashboardState(patch) {
+    this._data.premStatsDashboard = { ...this._data.premStatsDashboard, ...patch };
+    this._save();
   }
 
   // ── Dashboard ─────────────────────────────────────────────────────────────

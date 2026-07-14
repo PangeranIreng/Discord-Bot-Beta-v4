@@ -14,6 +14,7 @@ import { denyIfNotStaff } from "./permissions.js";
 import { revokePremiumRole } from "../boombox/premiumRoleSync.js";
 import { appendToPremiumLog } from "../boombox/premiumLog.js";
 import { updateMonitoringDashboard } from "../boombox/monitoringDashboard.js";
+import { updatePremStatsDashboard } from "../boombox/premStatsDashboard.js";
 import { IDS } from "../config/ids.js";
 
 export const data = new SlashCommandBuilder()
@@ -69,4 +70,5 @@ export async function execute(interaction) {
   });
 
   updateMonitoringDashboard(interaction.client).catch(() => {});
+  updatePremStatsDashboard(interaction.client).catch(() => {});
 }

@@ -15,6 +15,7 @@ import { premDB } from "./db.js";
 import { revokePremiumRole } from "./premiumRoleSync.js";
 import { appendToPremiumLog } from "./premiumLog.js";
 import { updateMonitoringDashboard } from "./monitoringDashboard.js";
+import { updatePremStatsDashboard } from "./premStatsDashboard.js";
 import { logger } from "../utils/logger.js";
 import { logError } from "../utils/errorLogger.js";
 
@@ -85,9 +86,10 @@ async function sweepOnce(client) {
       anyChanged = true;
     }
 
-    // ── Update dashboard if anything changed ──────────────────────────────
+    // ── Update dashboards if anything changed ────────────────────────────
     if (anyChanged) {
       await updateMonitoringDashboard(client);
+      updatePremStatsDashboard(client).catch(() => {});
     }
   } catch (e) {
     logger.error(`[Premium] Sweep failed: ${e.message}`);

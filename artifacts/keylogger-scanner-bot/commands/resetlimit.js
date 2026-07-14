@@ -11,6 +11,7 @@ import { premDB, db } from "../boombox/db.js";
 import { denyIfNotStaff } from "./permissions.js";
 import { appendToPremiumLog } from "../boombox/premiumLog.js";
 import { updateMonitoringDashboard } from "../boombox/monitoringDashboard.js";
+import { updatePremStatsDashboard } from "../boombox/premStatsDashboard.js";
 
 export const data = new SlashCommandBuilder()
   .setName("resetlimit")
@@ -51,4 +52,5 @@ export async function execute(interaction) {
   });
 
   updateMonitoringDashboard(interaction.client).catch(() => {});
+  updatePremStatsDashboard(interaction.client).catch(() => {});
 }

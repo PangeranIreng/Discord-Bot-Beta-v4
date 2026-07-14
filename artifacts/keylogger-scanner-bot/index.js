@@ -15,6 +15,8 @@ import { IDS } from "./config/ids.js";
 import { startPremiumSweep } from "./boombox/premiumSweep.js";
 import { updateMonitoringDashboard } from "./boombox/monitoringDashboard.js";
 import { handleMonitoringInteraction } from "./boombox/monitoringInteraction.js";
+import { handlePremStatsInteraction } from "./boombox/premStatsInteraction.js";
+import { updatePremStatsDashboard } from "./boombox/premStatsDashboard.js";
 import { handleTicketThreadMessage } from "./ticket/ticketHandler.js";
 import { handleTicketInteraction } from "./ticket/ticketInteraction.js";
 import { updateTicketDashboard } from "./ticket/ticketDashboard.js";
@@ -123,6 +125,12 @@ function startBot(secrets) {
       logger.warn("Dashboard init failed on startup:", err?.message);
     });
 
+    // Initialise the new Premium Stats dashboard if /premstats has already
+    // been configured (channelId stored in premDB). No-op on first launch.
+    updatePremStatsDashboard(client).catch((err) => {
+      logger.warn("PremStats dashboard init failed on startup:", err?.message);
+    });
+
     // Same for the Ticket Logs dashboard, if /cticket has already been
     // configured in a previous session.
     if (ticketDB.getConfig().logsChannelId) {
@@ -226,7 +234,9 @@ function startBot(secrets) {
 
       const id = interaction.customId ?? "";
 
-      if (id.startsWith("mon:")) {
+      if (id.startsWith("ps:")) {
+        await handlePremStatsInteraction(interaction, client);
+      } else if (id.startsWith("mon:")) {
         await handleMonitoringInteraction(interaction, client);
       } else if (id.startsWith("ticket:")) {
         await handleTicketInteraction(interaction);

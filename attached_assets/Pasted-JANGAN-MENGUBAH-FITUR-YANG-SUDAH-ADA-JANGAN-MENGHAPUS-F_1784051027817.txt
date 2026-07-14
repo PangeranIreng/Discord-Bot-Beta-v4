@@ -1,0 +1,315 @@
+JANGAN MENGUBAH FITUR YANG SUDAH ADA.
+
+JANGAN MENGHAPUS FILE YANG TIDAK BERHUBUNGAN.
+
+JANGAN MENGUBAH UI YANG SUDAH BAGUS.
+
+JANGAN MENGUBAH DATABASE.
+
+JANGAN MENGUBAH EMBED LAIN.
+
+JANGAN MENGUBAH COMMAND YANG SUDAH BERFUNGSI.
+
+SEMUA FITUR LAMA WAJIB TETAP BERJALAN.
+
+==================================================
+1. HAPUS PREMIUM MONITORING LAMA
+==================================================
+
+Hapus sistem Premium Monitoring lama.
+
+Yang dimaksud adalah panel embed seperti:
+
+👑 Premium Monitoring
+
+Premium Active
+
+Custom Limit Active
+
+Permanent Premium
+
+Temporary Premium
+
+Permanent Custom Limit
+
+Temporary Custom Limit
+
+Last Premium User
+
+Last Custom Limit User
+
+Seluruh sistem tersebut sudah tidak dipakai lagi.
+
+==================================================
+2. OTOMATIS HAPUS PESAN LAMA
+==================================================
+
+Saat /premstats pertama kali dijalankan:
+
+Cari embed Premium Monitoring lama.
+
+Jika ditemukan:
+
+hapus otomatis.
+
+Jangan biarkan ada dua panel.
+
+Hanya boleh ada SATU panel Premium Stats.
+
+==================================================
+3. COMMAND BARU
+==================================================
+
+Tambahkan command baru:
+
+/premstats
+
+Hanya Owner dan Developer.
+
+Saat dijalankan:
+
+Bot meminta Channel.
+
+Setelah dipilih:
+
+Bot membuat satu panel Premium Stats.
+
+Selanjutnya panel hanya diedit.
+
+Jangan mengirim pesan baru setiap update.
+
+==================================================
+4. PREMIUM STATS BARU
+==================================================
+
+Gunakan desain modern.
+
+Mirip BoomBox Logs.
+
+Rapi.
+
+Compact.
+
+Mudah dibaca.
+
+Contoh struktur:
+
+👑 Premium Statistics
+
+━━━━━━━━━━━━━━━━━━
+
+📊 Summary
+
+Premium Active
+
+Premium Permanent
+
+Premium Temporary
+
+━━━━━━━━━━━━━━━━━━
+
+🎵 Custom Limit
+
+Limit Active
+
+Limit Permanent
+
+Limit Temporary
+
+━━━━━━━━━━━━━━━━━━
+
+👑 Premium Users
+
+@User
+
+Unlimited
+
+Permanent
+
+atau
+
+Unlimited
+
+2d 5h 20m
+
+━━━━━━━━━━━━━━━━━━
+
+🎵 Custom Limit Users
+
+@User
+
+Limit : 30 / Hari
+
+Sisa : 18
+
+Expire : 2d 5h
+
+atau
+
+Permanent
+
+━━━━━━━━━━━━━━━━━━
+
+🕒 Last Update
+
+15 Juli 2026
+
+00:37:52 WIB
+
+==================================================
+5. AUTO UPDATE
+==================================================
+
+Panel harus otomatis update ketika:
+
+Premium baru ditambahkan.
+
+Premium dihapus.
+
+Premium expired.
+
+Set Limit User.
+
+Set Limit Role.
+
+Limit direset.
+
+Custom Limit berubah.
+
+Sisa limit berubah.
+
+Tidak perlu command ulang.
+
+Bot hanya edit panel.
+
+==================================================
+6. USER EXPIRED
+==================================================
+
+User yang sudah expired:
+
+Jangan ditampilkan lagi.
+
+Jangan memenuhi panel.
+
+Cukup kirim log ke Premium Logs.
+
+==================================================
+7. BUTTON
+==================================================
+
+Tambahkan tombol:
+
+🔄 Refresh
+
+Hanya Owner dan Developer.
+
+Refresh hanya mengedit panel.
+
+==================================================
+8. FORMAT WAKTU
+==================================================
+
+Gunakan format:
+
+2d 5h 30m
+
+3h 20m
+
+25m
+
+Permanent
+
+Jika permanen:
+
+Tampilkan:
+
+Permanent
+
+==================================================
+9. LIMIT MESSAGE
+==================================================
+
+Saat user mencapai limit BoomBox.
+
+Pesan harus bersifat ephemeral / private.
+
+Hanya user tersebut yang bisa melihat.
+
+User lain tidak boleh melihat.
+
+Desain baru:
+
+━━━━━━━━━━━━━━━━━━
+
+❌ BoomBox Limit
+
+Kamu telah mencapai batas penggunaan hari ini.
+
+📊 Sisa Limit
+0
+
+🔄 Reset
+Besok
+
+⭐ Upgrade ke Premium untuk mendapatkan akses BoomBox tanpa batas harian.
+
+━━━━━━━━━━━━━━━━━━
+
+Hapus tombol.
+
+Hapus tulisan Processing lebih cepat.
+
+Hapus tombol Premium.
+
+Hanya tampil informasi di atas.
+
+==================================================
+10. HELP COMMAND
+==================================================
+
+Tambahkan:
+
+/premstats
+
+ke kategori Admin.
+
+==================================================
+11. JANGAN UBAH FITUR LAIN
+==================================================
+
+Jangan mengubah:
+
+BoomBox
+
+Scanner
+
+Ticket
+
+Claim Ticket
+
+Premium System
+
+Custom Limit
+
+Database
+
+Help
+
+Thread
+
+CPanel
+
+Logs
+
+Slash Command lainnya
+
+==================================================
+12. FINAL CHECK
+==================================================
+
+Pastikan:
+
+✅ Premium Monitoring lama dihapus.
+
+✅ Pesan lama otomatis dihapus ketika

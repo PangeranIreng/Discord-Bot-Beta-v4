@@ -3,12 +3,15 @@
     "freeDailyLimit": 3
   },
   "dailyUsage": {
-    "2026-07-13": {}
+    "2026-07-13": {},
+    "2026-07-14": {
+      "1526499408282390619": 2
+    }
   },
   "statistics": {
-    "total": 32,
+    "total": 40,
     "byPlatform": {
-      "YouTube": 32
+      "YouTube": 40
     }
   },
   "history": [
@@ -320,11 +323,139 @@
       "duration": 382,
       "limitRemaining": "Unlimited",
       "timestamp": "2026-07-14T13:07:25.933Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Lil Nas X - Old Town Road (Lyrics) feat. Billy Ray Cyrus",
+      "originalUrl": "https://youtu.be/5By8AYFj-cw?si=O_q1JUuCm2W6naPd",
+      "boomboxUrl": "https://h.top4top.io/m_3847grcwr0.mp3",
+      "duration": 157,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:27.042Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Taylor Swift - The Fate of Ophelia",
+      "originalUrl": "https://youtu.be/WNmsURkR2-w?si=HH3gVdjCIdAj--Dk",
+      "boomboxUrl": "https://j.top4top.io/m_3847xkrgv0.mp3",
+      "duration": 226,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:30.111Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "TRESNO LIYANExDrill RNara Ft  NAHMIER  (Lyrics Video)",
+      "originalUrl": "https://youtu.be/OjeYWxhJv5c?si=1hnL8UjjCEq4Gq97",
+      "boomboxUrl": "https://k.top4top.io/m_3847bx19a0.mp3",
+      "duration": 166,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:32.359Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Hank Williams - Hey, Good Lookin' (Lyrics)",
+      "originalUrl": "https://youtu.be/dLKTYAt31ic?si=N6sntJ_Tz_Wg32Rp",
+      "boomboxUrl": "https://a.top4top.io/m_3847asvzw0.mp3",
+      "duration": 182,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:35.512Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "Maroon 5 - Animals (Lyrics)",
+      "originalUrl": "https://youtu.be/0GVExpdmoDs?si=fLf1tBaCXHrAUFh0",
+      "boomboxUrl": "https://c.top4top.io/m_3847z3ibs0.mp3",
+      "duration": 229,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:38.599Z"
+    },
+    {
+      "userId": "1462685321262272664",
+      "platform": "YouTube",
+      "title": "DJ DENOK KONSER NDX AKA FULL SONG || BUNGAHKU TEMBUS TEKAN KAYANGAN VIRAL TIKTOK TERBARU 2026",
+      "originalUrl": "https://youtu.be/-G7aOhW1ZsU?si=Rx0jidYen-UJCvta",
+      "boomboxUrl": "https://e.top4top.io/m_38471xca50.mp3",
+      "duration": 293,
+      "limitRemaining": "Unlimited",
+      "timestamp": "2026-07-14T16:57:49.563Z"
+    },
+    {
+      "userId": "1526499408282390619",
+      "platform": "YouTube",
+      "title": "NGAMEN 4 - AJENG FEBRIA (Official Music Live) Aku pancen wong ra nduwe isin",
+      "originalUrl": "https://youtu.be/D1PViDitRn8?si=8hCR1lSCIbUUgPbX",
+      "boomboxUrl": "https://f.top4top.io/m_3847p6nig0.mp3",
+      "duration": 340,
+      "limitRemaining": "0/1",
+      "timestamp": "2026-07-14T17:09:16.624Z"
+    },
+    {
+      "userId": "1526499408282390619",
+      "platform": "YouTube",
+      "title": "DJ JATUH CINTA X MY HEART - BOOTLEG (imamsidik remix) SOUND FYP TIKTOK 2026??!!",
+      "originalUrl": "https://youtu.be/mNyOkRXIh4M?si=1sTVZDugebA3vrms",
+      "boomboxUrl": "https://k.top4top.io/m_38474kacs0.mp3",
+      "duration": 438,
+      "limitRemaining": "1/3",
+      "timestamp": "2026-07-14T17:09:46.853Z"
     }
   ],
   "logState": {
     "messageId": "1526256015941832776",
     "entries": [
+      {
+        "title": "DJ JATUH CINTA X MY HEART - BOOTLEG (imamsidik remix) SOUND FYP TIKTOK 2026??!!",
+        "duration": 438,
+        "boomboxUrl": "https://k.top4top.io/m_38474kacs0.mp3",
+        "timestamp": "2026-07-14T17:09:46.853Z"
+      },
+      {
+        "title": "NGAMEN 4 - AJENG FEBRIA (Official Music Live) Aku pancen wong ra nduwe isin",
+        "duration": 340,
+        "boomboxUrl": "https://f.top4top.io/m_3847p6nig0.mp3",
+        "timestamp": "2026-07-14T17:09:16.624Z"
+      },
+      {
+        "title": "DJ DENOK KONSER NDX AKA FULL SONG || BUNGAHKU TEMBUS TEKAN KAYANGAN VIRAL TIKTOK TERBARU 2026",
+        "duration": 293,
+        "boomboxUrl": "https://e.top4top.io/m_38471xca50.mp3",
+        "timestamp": "2026-07-14T16:57:49.563Z"
+      },
+      {
+        "title": "Maroon 5 - Animals (Lyrics)",
+        "duration": 229,
+        "boomboxUrl": "https://c.top4top.io/m_3847z3ibs0.mp3",
+        "timestamp": "2026-07-14T16:57:38.599Z"
+      },
+      {
+        "title": "Hank Williams - Hey, Good Lookin' (Lyrics)",
+        "duration": 182,
+        "boomboxUrl": "https://a.top4top.io/m_3847asvzw0.mp3",
+        "timestamp": "2026-07-14T16:57:35.512Z"
+      },
+      {
+        "title": "TRESNO LIYANExDrill RNara Ft  NAHMIER  (Lyrics Video)",
+        "duration": 166,
+        "boomboxUrl": "https://k.top4top.io/m_3847bx19a0.mp3",
+        "timestamp": "2026-07-14T16:57:32.359Z"
+      },
+      {
+        "title": "Taylor Swift - The Fate of Ophelia",
+        "duration": 226,
+        "boomboxUrl": "https://j.top4top.io/m_3847xkrgv0.mp3",
+        "timestamp": "2026-07-14T16:57:30.111Z"
+      },
+      {
+        "title": "Lil Nas X - Old Town Road (Lyrics) feat. Billy Ray Cyrus",
+        "duration": 157,
+        "boomboxUrl": "https://h.top4top.io/m_3847grcwr0.mp3",
+        "timestamp": "2026-07-14T16:57:27.042Z"
+      },
       {
         "title": "JALARANING TRESNO - AJENG FEBRIA FT NGAWOT MUSIC (Official Live Music) Puspita kang manis ayu",
         "duration": 382,
